@@ -1,4 +1,7 @@
 import streamlit as st
+
+st.write("Debug - Sheet ID:", st.secrets.get("SHEET_ID", "NOT FOUND"))
+st.write("Debug - Service Account:", "Loaded" if "gcp_service_account" in st.secrets else "NOT FOUND")
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
