@@ -1,22 +1,27 @@
 import streamlit as st
 import gspread
 from google.oauth2 import service_account
+from google.auth.transport.requests import Request
 import pandas as pd
 from datetime import datetime
-import json
 
 class OrderDataLoader:
     def __init__(self):
-        # Get Sheet ID from secrets or config
+        # Get Sheet ID from secrets
         try:
             self.sheet_id = st.secrets["SHEET_ID"]
         except:
-            # Fallback to hardcoded or config
-            self.sheet_id = "your-default-sheet-id-here"  # Replace with your actual sheet ID
+            self.sheet_id = "your-default-sheet-id-here"
     
     def get_credentials(self):
-        """Get credentials from Streamlit Secrets"""
+        """Get credentials from Streamlit Secrets with proper scopes"""
         try:
+            # Define required scopes for Google Sheets
+            SCOPES = [
+                'https://www.googleapis.com/auth/spreadsheets.readonly',
+                'https://www.googleapis.com/auth/drive.readonly'
+            ]
+            
             # Load from Streamlit Cloud Secrets
             credentials_dict = {
                 "type": st.secrets["gcp_service_account"]["type"],
@@ -31,11 +36,20 @@ class OrderDataLoader:
                 "client_x509_cert_url": st.secrets["gcp_service_account"]["client_x509_cert_url"],
                 "universe_domain": st.secrets["gcp_service_account"]["universe_domain"]
             }
-            creds = service_account.Credentials.from_service_account_info(credentials_dict)
+            
+            # Create credentials with scopes
+            creds = service_account.Credentials.from_service_account_info(
+                credentials_dict,
+                scopes=SCOPES
+            )
+            
+            # Refresh token
+            creds.refresh(Request())
+            
             return creds
+            
         except Exception as e:
-            st.error(f"❌ Failed to load credentials from secrets: {str(e)}")
-            st.info("💡 Make sure you've added secrets in Streamlit Cloud settings!")
+            st.error(f"❌ Credentials error: {str(e)}")
             return None
     
     def fetch_data(self):
@@ -45,32 +59,55 @@ class OrderDataLoader:
             return pd.DataFrame()
         
         try:
+            # Authorize gspread with credentials
             client = gspread.authorize(creds)
-            sheet = client.open_by_key(self.sheet_id)
-            worksheet = sheet.get_worksheet(0)
+            
+            # Open sheet by key
+            spreadsheet = client.open_by_key(self.sheet_id)
+            worksheet = spreadsheet.sheet1  # First worksheet
+            
+            # Get all records
             data = worksheet.get_all_records()
+            
+            if not data:
+                st.warning("⚠️ Sheet is empty")
+                return pd.DataFrame()
             
             df = pd.DataFrame(data)
             
-            # Process your data (adjust column names as per your sheet)
+            # Process data (adjust column names as per your sheet)
             if 'Date' in df.columns:
-                df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+                df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
                 df['Year'] = df['Date'].dt.year
                 df['Month'] = df['Date'].dt.month
                 df['Month_Name'] = df['Date'].dt.strftime('%B')
             
             # Ensure numeric columns
-            numeric_cols = ['Qty', 'Total_Amount', 'Unit_Price']
+            numeric_cols = ['Qty', 'Total_Amount', 'Unit_Price', 'Quantity']
             for col in numeric_cols:
                 if col in df.columns:
                     df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
             
-            # Ensure EDD column exists for lead time analysis
+            # EDD column for lead time
             if 'EDD' in df.columns:
-                df['EDD'] = pd.to_datetime(df['EDD'], errors='coerce')
+                df['EDD'] = pd.to_datetime(df['EDD'], dayfirst=True, errors='coerce')
+            
+            # State and Product columns
+            if 'State' in df.columns:
+                df['State'] = df['State'].astype(str).str.strip()
+            if 'Product' in df.columns:
+                df['Product'] = df['Product'].astype(str).str.strip()
+            if 'Company' in df.columns:
+                df['Company'] = df['Company'].astype(str).str.strip()
             
             return df
             
+        except gspread.exceptions.SpreadsheetNotFound:
+            st.error("❌ Spreadsheet not found! Check SHEET_ID in secrets.")
+            return pd.DataFrame()
+        except gspread.exceptions.WorksheetNotFound:
+            st.error("❌ Worksheet not found! Check if sheet has data.")
+            return pd.DataFrame()
         except Exception as e:
             st.error(f"❌ Error fetching data: {str(e)}")
             return pd.DataFrame()
