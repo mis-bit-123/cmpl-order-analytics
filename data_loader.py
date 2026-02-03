@@ -1,119 +1,93 @@
-import gspread
-from google.oauth2.service_account import Credentials
-import pandas as pd
-import numpy as np
 import streamlit as st
-from config import SHEET_ID, SHEET_NAME, CREDENTIALS_FILE
+import gspread
+from google.oauth2 import service_account
+import pandas as pd
+from datetime import datetime
+import json
 
 class OrderDataLoader:
     def __init__(self):
-        self.df = None
-        
-    def connect(self):
-        """Connect to Google Sheets"""
+        # Get Sheet ID from secrets or config
         try:
-            scope = [
-                'https://spreadsheets.google.com/feeds',
-                'https://www.googleapis.com/auth/drive'
-            ]
-            creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=scope)
+            self.sheet_id = st.secrets["SHEET_ID"]
+        except:
+            # Fallback to hardcoded or config
+            self.sheet_id = "your-default-sheet-id-here"  # Replace with your actual sheet ID
+    
+    def get_credentials(self):
+        """Get credentials from Streamlit Secrets"""
+        try:
+            # Load from Streamlit Cloud Secrets
+            credentials_dict = {
+                "type": st.secrets["gcp_service_account"]["type"],
+                "project_id": st.secrets["gcp_service_account"]["project_id"],
+                "private_key_id": st.secrets["gcp_service_account"]["private_key_id"],
+                "private_key": st.secrets["gcp_service_account"]["private_key"],
+                "client_email": st.secrets["gcp_service_account"]["client_email"],
+                "client_id": st.secrets["gcp_service_account"]["client_id"],
+                "auth_uri": st.secrets["gcp_service_account"]["auth_uri"],
+                "token_uri": st.secrets["gcp_service_account"]["token_uri"],
+                "auth_provider_x509_cert_url": st.secrets["gcp_service_account"]["auth_provider_x509_cert_url"],
+                "client_x509_cert_url": st.secrets["gcp_service_account"]["client_x509_cert_url"],
+                "universe_domain": st.secrets["gcp_service_account"]["universe_domain"]
+            }
+            creds = service_account.Credentials.from_service_account_info(credentials_dict)
+            return creds
+        except Exception as e:
+            st.error(f"❌ Failed to load credentials from secrets: {str(e)}")
+            st.info("💡 Make sure you've added secrets in Streamlit Cloud settings!")
+            return None
+    
+    def fetch_data(self):
+        """Fetch data from Google Sheets"""
+        creds = self.get_credentials()
+        if creds is None:
+            return pd.DataFrame()
+        
+        try:
             client = gspread.authorize(creds)
-            return client
-        except Exception as e:
-            st.error(f"Connection Error: {e}")
-            return None
-    
-    @st.cache_data(ttl=300)
-    def fetch_data(_self):
-        """Fetch data from Google Sheet"""
-        try:
-            client = _self.connect()
-            if not client:
-                return None
-                
-            sheet = client.open_by_key(SHEET_ID)
-            worksheet = sheet.worksheet(SHEET_NAME)
+            sheet = client.open_by_key(self.sheet_id)
+            worksheet = sheet.get_worksheet(0)
+            data = worksheet.get_all_records()
             
-            # Get all values
-            all_values = worksheet.get_all_values()
-            data_rows = all_values[1:]  # Skip header
+            df = pd.DataFrame(data)
             
-            # Extract columns: A=0, B=1, D=3, G=6, H=7, I=8, O=14, S=18
-            processed_data = []
-            for row in data_rows:
-                if len(row) >= 19:
-                    try:
-                        processed_data.append({
-                            'Date': row[0],           # A: Timestamp
-                            'Inquiry_No': row[1],     # B: Inquiry No
-                            'Company': row[3],        # D: Company Name
-                            'Product': row[6],        # G: Product Description
-                            'Qty': row[7],            # H: Quantity
-                            'State': row[9],          # J: State
-                            'Total_Amount': row[14],  # O: Total Amount
-                            'EDD': row[18]            # S: Delivery Date
-                        })
-                    except:
-                        continue
+            # Process your data (adjust column names as per your sheet)
+            if 'Date' in df.columns:
+                df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+                df['Year'] = df['Date'].dt.year
+                df['Month'] = df['Date'].dt.month
+                df['Month_Name'] = df['Date'].dt.strftime('%B')
             
-            df = pd.DataFrame(processed_data)
-            df = _self.clean_data(df)
+            # Ensure numeric columns
+            numeric_cols = ['Qty', 'Total_Amount', 'Unit_Price']
+            for col in numeric_cols:
+                if col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            
+            # Ensure EDD column exists for lead time analysis
+            if 'EDD' in df.columns:
+                df['EDD'] = pd.to_datetime(df['EDD'], errors='coerce')
+            
             return df
             
         except Exception as e:
-            st.error(f"Data Fetch Error: {e}")
-            return None
-    
-    def clean_data(self, df):
-        """Clean and format data"""
-        if df.empty:
-            return df
-            
-        # Clean Date
-        df['Date'] = pd.to_datetime(df['Date'], errors='coerce', dayfirst=True)
-        
-        # Clean Amount (remove ₹ and commas)
-        df['Total_Amount'] = df['Total_Amount'].astype(str).str.replace(r'[₹,]', '', regex=True)
-        df['Total_Amount'] = pd.to_numeric(df['Total_Amount'], errors='coerce')
-        
-        # Clean Quantity
-        df['Qty'] = pd.to_numeric(df['Qty'], errors='coerce').fillna(1)
-        
-        # Clean State
-        df['State'] = df['State'].str.strip().str.title()
-        df['State'] = df['State'].replace({'N/A': 'Not Specified', 'Na': 'Not Specified'})
-        
-        # Clean Product & Company
-        df['Product'] = df['Product'].str.strip()
-        df['Company'] = df['Company'].str.strip().str.title()
-        
-        # Process EDD
-        df['EDD'] = pd.to_datetime(df['EDD'], errors='coerce', dayfirst=True)
-        df['Lead_Time_Days'] = (df['EDD'] - df['Date']).dt.days
-        
-        # Add derived columns
-        df['Year'] = df['Date'].dt.year
-        df['Month'] = df['Date'].dt.month
-        df['Month_Name'] = df['Date'].dt.month_name()
-        
-        # Remove invalid rows
-        df = df.dropna(subset=['Date', 'Total_Amount'])
-        
-        return df
+            st.error(f"❌ Error fetching data: {str(e)}")
+            return pd.DataFrame()
     
     def get_stats(self, df):
-        """Calculate summary statistics"""
-        if df is None or df.empty:
-            return {}
-            
+        """Calculate statistics"""
+        if df.empty:
+            return {
+                'total_orders': 0,
+                'total_revenue': 0,
+                'total_qty': 0,
+                'avg_order_value': 0
+            }
+        
         return {
             'total_orders': len(df),
-            'total_revenue': df['Total_Amount'].sum(),
-            'total_qty': df['Qty'].sum(),
-            'avg_order': df['Total_Amount'].mean(),
-            'top_state': df.groupby('State')['Total_Amount'].sum().idxmax() if not df.empty else "N/A",
-            'date_range': {
-                'start': df['Date'].min(),
-                'end': df['Date'].max()
-            }
+            'total_revenue': df['Total_Amount'].sum() if 'Total_Amount' in df.columns else 0,
+            'total_qty': df['Qty'].sum() if 'Qty' in df.columns else 0,
+            'avg_order_value': df['Total_Amount'].mean() if 'Total_Amount' in df.columns else 0
         }
