@@ -1,26 +1,6 @@
-# Streamlit secrets (local only - NEVER commit this!)
-.streamlit/secrets.toml
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
 venv/
-ENV/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-
-# OS
+__pycache__/
+credentials/*.json
+*.pyc
 .DS_Store
-Thumbs.db
-
-# Credentials (backup safety)
-credentials/
-*.json
-.env
+temp_data.xlsx

@@ -1,7 +1,4 @@
 import streamlit as st
-
-st.write("Debug - Sheet ID:", st.secrets.get("SHEET_ID", "NOT FOUND"))
-st.write("Debug - Service Account:", "Loaded" if "gcp_service_account" in st.secrets else "NOT FOUND")
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -19,9 +16,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional CSS
+# ==========================================
+# PROFESSIONAL GLOBAL CSS
+# ==========================================
 st.markdown("""
 <style>
+
+    /* Main Header */
     .main-header { 
         font-size: 2.8rem; 
         font-weight: 800; 
@@ -31,6 +32,7 @@ st.markdown("""
         padding-bottom: 10px;
         border-bottom: 3px solid #1f77b4;
     }
+
     .subheader { 
         font-size: 1.5rem; 
         font-weight: 600; 
@@ -38,6 +40,7 @@ st.markdown("""
         margin-top: 20px;
         margin-bottom: 10px;
     }
+
     .metric-card { 
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 20px; 
@@ -45,10 +48,12 @@ st.markdown("""
         color: white;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+
     .metric-value {
         font-size: 2rem;
         font-weight: bold;
     }
+
     .filter-box {
         background-color: #f8f9fa;
         padding: 20px;
@@ -56,9 +61,9 @@ st.markdown("""
         border: 1px solid #dee2e6;
         margin-bottom: 20px;
     }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
-    }
+
+    /* Tab Styling */
+    .stTabs [data-baseweb="tab-list"] { gap: 10px; }
     .stTabs [data-baseweb="tab"] {
         background-color: #f0f2f6;
         border-radius: 5px;
@@ -69,10 +74,38 @@ st.markdown("""
         background-color: #1f77b4 !important;
         color: white !important;
     }
+
+    /* Side Radio Buttons */
+    .stRadio > div {
+        background-color: #101a24;
+        border-radius: 10px;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .stRadio label {
+        font-weight: 500 !important;
+        padding: 0.4rem 0.6rem !important;
+        border-radius: 6px !important;
+        margin: 0.2rem 0 !important;
+        transition: all 0.2s;
+    }
+    .stRadio label:hover {
+        background-color: #e9ecef;
+        transform: translateX(3px);
+    }
+    .stRadio [aria-selected="true"] {
+        background-color: #1f77b4 !important;
+        color: black !important;
+        font-weight: 600 !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize
+
+# ==========================================
+# DATA INITIALIZATION
+# ==========================================
 @st.cache_resource
 def get_loader():
     return OrderDataLoader()
@@ -97,9 +130,8 @@ if df is not None and not df.empty:
     stats = loader.get_stats(df)
 else:
     record_count = 0
-
 # ==========================================
-# SIDEBAR NAVIGATION (Only Radio Buttons Now)
+# SIDEBAR HEADER (Now df is defined)
 # ==========================================
 st.sidebar.markdown(f"""
 <div style="text-align: center; padding: 1.5rem 0.5rem; background: linear-gradient(135deg, #1f77b4 0%, #ff7f0e 100%); border-radius: 15px; margin-bottom: 1.5rem; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -112,6 +144,10 @@ st.sidebar.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# ==========================================
+# SIDEBAR NAVIGATION (NO CATEGORY TITLES)
+# ==========================================
+
 report_categories = {
     "📊 Overview": ["🏠 Executive Dashboard", "📈 Performance Metrics"],
     "🗺️ Geographic": ["🗺️ State-wise Deep Dive", "🗺️ State vs Product Matrix", "🗺️ Regional Comparison"],
@@ -122,77 +158,52 @@ report_categories = {
     "📥 Export": ["📋 Raw Data Explorer"]
 }
 
-# Create flat list for radio
+# Flatten into single radio list
 all_reports = []
 for reports in report_categories.values():
     all_reports.extend(reports)
 
-# -------------------------
-# RADIO BUTTON + CSS ONLY
-# -------------------------
-
-st.sidebar.markdown("""
-<style>
-    .stRadio > div {
-        background-color: #101a24;
-        border-radius: 10px;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    .stRadio label {
-        font-weight: 500 !important;
-        padding: 0.4rem 0.6rem !important;
-        border-radius: 6px !important;
-        margin: 0.2rem 0 !important;
-        transition: all 0.2s;
-    }
-    .stRadio label:hover {
-        background-color: #e9ecef;
-        transform: translateX(3px);
-    }
-    .stRadio [aria-selected="true"] {
-        background-color: #1f77b4 !important;
-        color: black !important;
-        font-weight: 600 !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# RADIO BUTTON (ONLY THIS IN SIDEBAR)
+# RADIO BUTTON ONLY
 report = st.sidebar.radio("📌 Select Report", all_reports)
 
-# FOOTER
-st.sidebar.markdown("---")
-st.sidebar.caption(f"🔄 Auto-refresh: 60 min | 📊 Records: {record_count:,}")
-st.sidebar.caption("🔗 Connected to Google Sheets")
-
 
 # ==========================================
-# ERROR HANDLING (After sidebar is rendered)
+# LOAD DATA WITH ERROR HANDLING
 # ==========================================
+@st.cache_data(ttl=300)
+def load_data():
+    try:
+        return loader.fetch_data()
+    except Exception as e:
+        st.error(f"Data load error: {e}")
+        return None
+
+df = load_data()
+
 if df is None:
     st.error("❌ Failed to connect to Google Sheets!")
-    st.info("🔧 Troubleshooting:\n1. Check credentials/service_account.json exists\n2. Verify Sheet ID in config.py\n3. Ensure sheet is shared with service account")
+    st.info("🔧 Troubleshooting:\n1. Check credentials/service_account.json\n2. Verify Sheet ID in config.py\n3. Ensure sharing with service account")
     st.stop()
 
 if df.empty:
-    st.warning("⚠️ No data found in the sheet")
+    st.warning("⚠️ No data found in sheet")
     st.stop()
 
-# ==========================================
-# MAIN CONTENT (Rest of your code continues...)
-# ==========================================
-# Calculate enhanced stats (now safe to use df)
+# Stats
 stats = loader.get_stats(df)
+
+# Filters
 years = sorted(df['Year'].unique(), reverse=True)
 months = ["All"] + list(df['Month_Name'].unique())
 
-# HEADER
+
+# ==========================================
+# MAIN HEADER
+# ==========================================
 st.markdown(f"<h1 class='main-header'>{DASHBOARD_TITLE}</h1>", unsafe_allow_html=True)
 st.caption(f"🔄 Live Data | 📊 {len(df):,} records | 🕒 Updated: {datetime.now().strftime('%d-%m-%Y %H:%M')}")
 st.markdown("---")
 
-# ... rest of your reports code ...
 # ==========================================
 # REPORT 1: EXECUTIVE DASHBOARD
 # ==========================================
@@ -2314,7 +2325,6 @@ elif report == "📋 Raw Data Explorer":
     
    
 
-# # Global Footer
-# st.sidebar.markdown("---")
-# st.sidebar.caption(f"🔄 Auto-refresh: 5 min | 📊 Records: {len(df):,}")
-# st.sidebar.caption("🔗 Connected to Google Sheets")
+# Global Footer
+st.sidebar.markdown("---")
+st.sidebar.caption(f"🔄 Auto-refresh: 5 min | 📊 Records: {len(df):,}")
