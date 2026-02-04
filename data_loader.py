@@ -126,8 +126,6 @@
 
 
 
-
-
 import streamlit as st
 import gspread
 import pandas as pd
@@ -136,49 +134,57 @@ from config import SHEET_NAME, SHEET_ID
 
 class OrderDataLoader:
     def __init__(self):
-        """Initializes connection using either Secrets (Cloud) or local JSON file."""
+        # 1. Define the REQUIRED scopes
+        self.scope = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        
         try:
+            # 2. Check for Streamlit Cloud Secrets
             if "gcp_service_account" in st.secrets:
                 creds_info = st.secrets["gcp_service_account"]
-                self.creds = Credentials.from_service_account_info(creds_info)
+                # Attach scopes to info-based credentials
+                self.creds = Credentials.from_service_account_info(
+                    creds_info, 
+                    scopes=self.scope
+                )
                 self.sheet_id = st.secrets.get("SHEET_ID", SHEET_ID)
+            
+            # 3. Fallback to Local JSON
             else:
-                self.creds = Credentials.from_service_account_file("credentials/service_account.json")
+                self.creds = Credentials.from_service_account_file(
+                    "credentials/service_account.json", 
+                    scopes=self.scope
+                )
                 self.sheet_id = SHEET_ID
             
             self.client = gspread.authorize(self.creds)
+            
         except Exception as e:
             st.error(f"❌ Connection Setup Failed: {e}")
             self.client = None
 
     @st.cache_data(ttl=300)
     def fetch_data(_self):
-        """Fetches, cleans, and adds date-based columns for the dashboard."""
         if not _self.client: return None
         try:
             sheet = _self.client.open_by_key(_self.sheet_id).worksheet(SHEET_NAME)
             df = pd.DataFrame(sheet.get_all_records())
             
-            # Date Conversion
+            # (Keep your cleaning logic below as is...)
             df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-            df['EDD'] = pd.to_datetime(df['EDD'], errors='coerce')
-            
-            # Numeric Conversion
+            df['Year'] = df['Date'].dt.year.fillna(0).astype(int)
+            df['Month_Name'] = df['Date'].dt.strftime('%B').fillna('Unknown')
             for col in ['Qty', 'Total_Amount', 'Rate']:
                 if col in df.columns:
                     df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
-            
-            # Add Columns needed for app.py filters
-            df['Year'] = df['Date'].dt.year.fillna(0).astype(int)
-            df['Month_Name'] = df['Date'].dt.strftime('%B').fillna('Unknown')
-            
             return df
         except Exception as e:
             st.error(f"❌ Fetch Error: {e}")
             return None
 
     def get_stats(self, df):
-        """Calculates basic KPIs for the sidebar and dashboard."""
         if df is None or df.empty:
             return {"total_rev": 0, "total_qty": 0, "avg_order": 0}
         return {
