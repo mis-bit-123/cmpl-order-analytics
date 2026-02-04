@@ -119,19 +119,54 @@
 #         }
 import streamlit as st
 import gspread
+import pandas as pd
 from google.oauth2.service_account import Credentials
+from config import SHEET_NAME, SHEET_ID
 
-def load_data():
-    # 1. Check if we are on Streamlit Cloud (using Secrets)
-    if "gcp_service_account" in st.secrets:
-        creds_info = st.secrets["gcp_service_account"]
-        creds = Credentials.from_service_account_info(creds_info)
-    # 2. Otherwise, use the local file (for Localhost testing)
-    else:
-        creds = Credentials.from_service_account_file("credentials/service_account.json")
-        
-    client = gspread.authorize(creds)
-    # Get Sheet ID from secrets or config
-    sheet_id = st.secrets.get("SHEET_ID", "YOUR_LOCAL_FALLBACK_ID") 
-    sheet = client.open_by_key(sheet_id).worksheet("Order Confirmation")
-    return sheet.get_all_records()
+class OrderDataLoader:
+    def __init__(self):
+        """Initializes connection using either Secrets (Cloud) or local JSON file."""
+        try:
+            # 1. Attempt to load from Streamlit Cloud Secrets
+            if "gcp_service_account" in st.secrets:
+                creds_info = st.secrets["gcp_service_account"]
+                self.creds = Credentials.from_service_account_info(creds_info)
+                self.sheet_id = st.secrets.get("SHEET_ID", SHEET_ID)
+            # 2. Fallback to Local service_account.json
+            else:
+                self.creds = Credentials.from_service_account_file("credentials/service_account.json")
+                self.sheet_id = SHEET_ID
+            
+            self.client = gspread.authorize(self.creds)
+        except Exception as e:
+            st.error(f"❌ Initialization Error: {e}")
+            self.client = None
+
+    @st.cache_data(ttl=3600) # Cache data for 1 hour to save API quota
+    def fetch_data(_self):
+        """Fetches and cleans data from Google Sheets."""
+        if not _self.client:
+            return pd.DataFrame()
+
+        try:
+            sheet = _self.client.open_by_key(_self.sheet_id).worksheet(SHEET_NAME)
+            data = sheet.get_all_records()
+            df = pd.DataFrame(data)
+
+            # Basic Cleaning
+            if not df.empty:
+                if 'Date' in df.columns:
+                    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+                if 'EDD' in df.columns:
+                    df['EDD'] = pd.to_datetime(df['EDD'], errors='coerce')
+                
+                # Convert Numeric Columns
+                numeric_cols = ['Qty', 'Total_Amount', 'Rate']
+                for col in numeric_cols:
+                    if col in df.columns:
+                        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            
+            return df
+        except Exception as e:
+            st.error(f"❌ Error fetching data: {e}")
+            return pd.DataFrame()
