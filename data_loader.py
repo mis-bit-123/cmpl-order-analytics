@@ -116,7 +116,18 @@
 #                 'start': df['Date'].min(),
 #                 'end': df['Date'].max()
 #             }
+# 
+# 
+# 
+# 
+# 
 #         }
+
+
+
+
+
+
 import streamlit as st
 import gspread
 import pandas as pd
@@ -127,46 +138,51 @@ class OrderDataLoader:
     def __init__(self):
         """Initializes connection using either Secrets (Cloud) or local JSON file."""
         try:
-            # 1. Attempt to load from Streamlit Cloud Secrets
             if "gcp_service_account" in st.secrets:
                 creds_info = st.secrets["gcp_service_account"]
                 self.creds = Credentials.from_service_account_info(creds_info)
                 self.sheet_id = st.secrets.get("SHEET_ID", SHEET_ID)
-            # 2. Fallback to Local service_account.json
             else:
                 self.creds = Credentials.from_service_account_file("credentials/service_account.json")
                 self.sheet_id = SHEET_ID
             
             self.client = gspread.authorize(self.creds)
         except Exception as e:
-            st.error(f"❌ Initialization Error: {e}")
+            st.error(f"❌ Connection Setup Failed: {e}")
             self.client = None
 
-    @st.cache_data(ttl=3600) # Cache data for 1 hour to save API quota
+    @st.cache_data(ttl=300)
     def fetch_data(_self):
-        """Fetches and cleans data from Google Sheets."""
-        if not _self.client:
-            return pd.DataFrame()
-
+        """Fetches, cleans, and adds date-based columns for the dashboard."""
+        if not _self.client: return None
         try:
             sheet = _self.client.open_by_key(_self.sheet_id).worksheet(SHEET_NAME)
-            data = sheet.get_all_records()
-            df = pd.DataFrame(data)
-
-            # Basic Cleaning
-            if not df.empty:
-                if 'Date' in df.columns:
-                    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-                if 'EDD' in df.columns:
-                    df['EDD'] = pd.to_datetime(df['EDD'], errors='coerce')
-                
-                # Convert Numeric Columns
-                numeric_cols = ['Qty', 'Total_Amount', 'Rate']
-                for col in numeric_cols:
-                    if col in df.columns:
-                        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            df = pd.DataFrame(sheet.get_all_records())
+            
+            # Date Conversion
+            df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+            df['EDD'] = pd.to_datetime(df['EDD'], errors='coerce')
+            
+            # Numeric Conversion
+            for col in ['Qty', 'Total_Amount', 'Rate']:
+                if col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            
+            # Add Columns needed for app.py filters
+            df['Year'] = df['Date'].dt.year.fillna(0).astype(int)
+            df['Month_Name'] = df['Date'].dt.strftime('%B').fillna('Unknown')
             
             return df
         except Exception as e:
-            st.error(f"❌ Error fetching data: {e}")
-            return pd.DataFrame()
+            st.error(f"❌ Fetch Error: {e}")
+            return None
+
+    def get_stats(self, df):
+        """Calculates basic KPIs for the sidebar and dashboard."""
+        if df is None or df.empty:
+            return {"total_rev": 0, "total_qty": 0, "avg_order": 0}
+        return {
+            "total_rev": df['Total_Amount'].sum(),
+            "total_qty": df['Qty'].sum(),
+            "avg_order": df['Total_Amount'].mean()
+        }
