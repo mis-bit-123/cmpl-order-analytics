@@ -125,7 +125,6 @@
 
 
 
-
 import streamlit as st
 import gspread
 import pandas as pd
@@ -134,7 +133,7 @@ from config import SHEET_NAME, SHEET_ID
 
 class OrderDataLoader:
     def __init__(self):
-        # 1. Define the REQUIRED scopes
+        # 1. Define the REQUIRED scopes for Google Sheets and Drive
         self.scope = [
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/drive"
@@ -144,7 +143,6 @@ class OrderDataLoader:
             # 2. Check for Streamlit Cloud Secrets
             if "gcp_service_account" in st.secrets:
                 creds_info = st.secrets["gcp_service_account"]
-                # Attach scopes to info-based credentials
                 self.creds = Credentials.from_service_account_info(
                     creds_info, 
                     scopes=self.scope
@@ -167,26 +165,52 @@ class OrderDataLoader:
 
     @st.cache_data(ttl=300)
     def fetch_data(_self):
-        if not _self.client: return None
+        if not _self.client:
+            return None
         try:
             sheet = _self.client.open_by_key(_self.sheet_id).worksheet(SHEET_NAME)
-            df = pd.DataFrame(sheet.get_all_records())
             
-            # (Keep your cleaning logic below as is...)
-            df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-            df['Year'] = df['Date'].dt.year.fillna(0).astype(int)
-            df['Month_Name'] = df['Date'].dt.strftime('%B').fillna('Unknown')
-            for col in ['Qty', 'Total_Amount', 'Rate']:
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            # Use get_all_values to avoid the "duplicate header" crash
+            all_values = sheet.get_all_values()
+            if not all_values:
+                return pd.DataFrame()
+
+            # Clean headers (handles empty or duplicate names)
+            raw_headers = all_values[0]
+            clean_headers = []
+            for i, h in enumerate(raw_headers):
+                h_str = str(h).strip()
+                if h_str == "" or h_str in clean_headers:
+                    clean_headers.append(f"Column_{i}")
+                else:
+                    clean_headers.append(h_str)
+
+            # Create DataFrame from the remaining rows
+            df = pd.DataFrame(all_values[1:], columns=clean_headers)
+            
+            # Convert types (since get_all_values imports everything as text)
+            if not df.empty:
+                if 'Date' in df.columns:
+                    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+                    df['Year'] = df['Date'].dt.year.fillna(0).astype(int)
+                    df['Month_Name'] = df['Date'].dt.strftime('%B').fillna('Unknown')
+                
+                # Convert Numeric Columns
+                for col in ['Qty', 'Total_Amount', 'Rate']:
+                    if col in df.columns:
+                        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            
             return df
+            
         except Exception as e:
             st.error(f"❌ Fetch Error: {e}")
             return None
 
     def get_stats(self, df):
+        """Calculates basic KPIs for the sidebar and dashboard."""
         if df is None or df.empty:
             return {"total_rev": 0, "total_qty": 0, "avg_order": 0}
+        
         return {
             "total_rev": df['Total_Amount'].sum(),
             "total_qty": df['Qty'].sum(),
