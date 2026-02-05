@@ -117,10 +117,6 @@ class OrderDataLoader:
                 'end': df['Date'].max()
             }
 
-
-
-
-
         }
 
 
