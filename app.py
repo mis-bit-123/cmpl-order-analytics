@@ -210,32 +210,58 @@ st.markdown("---")
 if report == "🏠 Executive Dashboard":
     st.markdown("## 🎯 Executive Overview")
     
+    # Get unique years safely, handling both int and float formats
+    years = sorted(df['Year'].dropna().unique())
+    # Convert to clean integers for display
+    year_options = ["All"] + [str(int(float(y))) if pd.notna(y) else str(y) for y in years]
+    
     # Top filters
     with st.container():
         col_f1, col_f2, col_f3 = st.columns(3)
         with col_f1:
-            selected_year = st.selectbox("📅 Select Year:", ["All"] + [str(y) for y in years])
+            selected_year = st.selectbox("📅 Select Year:", year_options)
         with col_f2:
-            selected_state = st.selectbox("🗺️ Select State:", ["All"] + sorted(df['State'].unique().tolist()))
+            selected_state = st.selectbox("🗺️ Select State:", ["All"] + sorted(df['State'].dropna().unique().tolist()))
         with col_f3:
-            selected_product = st.selectbox("🔧 Select Product:", ["All"] + sorted(df['Product'].unique().tolist()))
+            selected_product = st.selectbox("🔧 Select Product:", ["All"] + sorted(df['Product'].dropna().unique().tolist()))
     
-    # Filter data
+    # Filter data with safe type handling
     filtered_df = df.copy()
+    
     if selected_year != "All":
-        filtered_df = filtered_df[filtered_df['Year'] == int(selected_year)]
+        # Handle both int and float year formats in data
+        selected_year_num = int(float(selected_year))
+        filtered_df = filtered_df[filtered_df['Year'].apply(
+            lambda x: int(float(x)) if pd.notna(x) else None
+        ) == selected_year_num]
+    
     if selected_state != "All":
         filtered_df = filtered_df[filtered_df['State'] == selected_state]
+    
     if selected_product != "All":
         filtered_df = filtered_df[filtered_df['Product'] == selected_product]
     
+    # Handle empty filtered data
+    if filtered_df.empty:
+        st.warning("⚠️ No data found for the selected filters.")
+        st.stop()
+    
     # KPI Cards with gradient
     cols = st.columns(4)
+    
+    total_revenue = filtered_df['Total_Amount'].sum()
+    total_qty = filtered_df['Qty'].sum()
+    avg_order = filtered_df['Total_Amount'].mean()
+    
+    # Safely get top product
+    product_sales = filtered_df.groupby('Product')['Total_Amount'].sum()
+    top_product = product_sales.idxmax() if not product_sales.empty else "N/A"
+    
     metrics = [
-        ("💰 Total Revenue", f"{CURRENCY}{filtered_df['Total_Amount'].sum():,.0f}", f"{len(filtered_df)} Orders"),
-        ("📦 Total Quantity", f"{filtered_df['Qty'].sum():,.0f}", "Units Sold"),
-        ("📊 Avg Order Value", f"{CURRENCY}{filtered_df['Total_Amount'].mean():,.0f}", "Per Order"),
-        ("🏆 Top Product", filtered_df.groupby('Product')['Total_Amount'].sum().idxmax() if not filtered_df.empty else "N/A", "Best Seller")
+        ("💰 Total Revenue", f"{CURRENCY}{total_revenue:,.0f}", f"{len(filtered_df)} Orders"),
+        ("📦 Total Quantity", f"{total_qty:,.0f}", "Units Sold"),
+        ("📊 Avg Order Value", f"{CURRENCY}{avg_order:,.0f}", "Per Order"),
+        ("🏆 Top Product", top_product, "Best Seller")
     ]
     
     for col, (label, value, delta) in zip(cols, metrics):
@@ -249,39 +275,72 @@ if report == "🏠 Executive Dashboard":
     with c1:
         st.markdown("### 💵 Revenue by State (Top 8)")
         state_data = filtered_df.groupby('State')['Total_Amount'].sum().nlargest(8).reset_index()
-        fig = px.bar(state_data, x='State', y='Total_Amount', color='Total_Amount',
-                    color_continuous_scale='Viridis', text=state_data['Total_Amount'].apply(lambda x: f'{CURRENCY}{x/100000:.1f}L'))
-        fig.update_layout(xaxis_tickangle=-45)
-        st.plotly_chart(fig, use_container_width=True)
+        if not state_data.empty:
+            fig = px.bar(
+                state_data, 
+                x='State', 
+                y='Total_Amount', 
+                color='Total_Amount',
+                color_continuous_scale='Viridis', 
+                text=state_data['Total_Amount'].apply(lambda x: f'{CURRENCY}{x/100000:.1f}L')
+            )
+            fig.update_layout(xaxis_tickangle=-45)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No state data available")
     
     with c2:
         st.markdown("### 🔥 Top 5 Products by Revenue")
         prod_data = filtered_df.groupby('Product')['Total_Amount'].sum().nlargest(5).reset_index()
-        fig = px.pie(prod_data, values='Total_Amount', names='Product', hole=0.5,
-                    color_discrete_sequence=px.colors.qualitative.Set3)
-        fig.update_traces(textposition='inside', textinfo='percent+label')
-        st.plotly_chart(fig, use_container_width=True)
+        if not prod_data.empty:
+            fig = px.pie(
+                prod_data, 
+                values='Total_Amount', 
+                names='Product', 
+                hole=0.5,
+                color_discrete_sequence=px.colors.qualitative.Set3
+            )
+            fig.update_traces(textposition='inside', textinfo='percent+label')
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No product data available")
     
     # Charts Row 2
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("### 📈 Monthly Revenue Trend")
-        monthly = filtered_df.groupby(filtered_df['Date'].dt.to_period('M'))['Total_Amount'].sum()
-        monthly.index = monthly.index.to_timestamp()
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=monthly.index, y=monthly.values, fill='tozeroy', 
-                                line=dict(color='#1f77b4', width=3), name='Revenue'))
-        fig.update_layout(height=350)
-        st.plotly_chart(fig, use_container_width=True)
+        if not filtered_df.empty and 'Date' in filtered_df.columns:
+            monthly = filtered_df.groupby(filtered_df['Date'].dt.to_period('M'))['Total_Amount'].sum()
+            monthly.index = monthly.index.to_timestamp()
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=monthly.index, 
+                y=monthly.values, 
+                fill='tozeroy', 
+                line=dict(color='#1f77b4', width=3), 
+                name='Revenue'
+            ))
+            fig.update_layout(height=350)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No date data available")
     
     with c2:
         st.markdown("### 🏢 Top 8 Companies")
         comp_data = filtered_df.groupby('Company')['Total_Amount'].sum().nlargest(8).reset_index()
-        fig = px.bar(comp_data, y='Company', x='Total_Amount', orientation='h', color='Total_Amount',
-                    color_continuous_scale='Blues')
-        fig.update_layout(yaxis=dict(autorange="reversed"))
-        st.plotly_chart(fig, use_container_width=True)
-
+        if not comp_data.empty:
+            fig = px.bar(
+                comp_data, 
+                y='Company', 
+                x='Total_Amount', 
+                orientation='h', 
+                color='Total_Amount',
+                color_continuous_scale='Blues'
+            )
+            fig.update_layout(yaxis=dict(autorange="reversed"))
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No company data available")
 # ==========================================
 # REPORT 2: PERFORMANCE METRICS
 # ==========================================
@@ -409,46 +468,393 @@ elif report == "🗺️ State vs Product Matrix":
     top_combos = df.groupby(['State', 'Product'])['Total_Amount'].sum().nlargest(20).reset_index()
     st.dataframe(top_combos, use_container_width=True)
 
+# # ==========================================
+# # REPORT 5: REGIONAL COMPARISON (FIXED COLORS)
+# # ==========================================
+# elif report == "🗺️ Regional Comparison":
+#     st.markdown("## 🗺️ Multi-State Comparison Tool")
+    
+#     col1, col2 = st.columns(2)
+#     with col1:
+#         state1 = st.selectbox("🗺️ Select State 1:", df['State'].unique(), index=0)
+#     with col2:
+#         state2 = st.selectbox("🗺️ Select State 2:", df['State'].unique(), index=1 if len(df['State'].unique()) > 1 else 0)
+    
+#     # Comparison logic
+#     s1_data = df[df['State'] == state1]
+#     s2_data = df[df['State'] == state2]
+    
+#     cols = st.columns(2)
+#     for idx, (state, data) in enumerate([(state1, s1_data), (state2, s2_data)]):
+#         with cols[idx]:
+#             st.markdown(f"### 🏳️ {state}")
+#             st.metric("Revenue", f"{CURRENCY}{data['Total_Amount'].sum():,.0f}")
+#             st.metric("Orders", f"{len(data)}")
+#             st.metric("Avg Order", f"{CURRENCY}{data['Total_Amount'].mean():,.0f}")
+#             st.metric("Top Product", data.groupby('Product')['Total_Amount'].sum().idxmax() if not data.empty else "N/A")
+    
+#     # Comparison chart with OPPOSITE/CONTRASTING colors
+#     comparison_df = pd.DataFrame({
+#         state1: s1_data.groupby('Product')['Total_Amount'].sum(),
+#         state2: s2_data.groupby('Product')['Total_Amount'].sum()
+#     }).fillna(0)
+    
+#     fig = go.Figure()
+#     # State 1 - Blue, State 2 - Orange/Red (Opposite colors)
+#     fig.add_trace(go.Bar(name=state1, x=comparison_df.index, y=comparison_df[state1], 
+#                         marker_color='#1f77b4'))  # Blue
+#     fig.add_trace(go.Bar(name=state2, x=comparison_df.index, y=comparison_df[state2], 
+#                         marker_color='#ff7f0e'))  # Orange (opposite of blue)
+#     fig.update_layout(barmode='group', title='Product-wise Comparison', xaxis_tickangle=-45)
+#     st.plotly_chart(fig, use_container_width=True)
 # ==========================================
-# REPORT 5: REGIONAL COMPARISON (FIXED COLORS)
+# REPORT 5: REGIONAL COMPARISON (ENHANCED)
 # ==========================================
 elif report == "🗺️ Regional Comparison":
     st.markdown("## 🗺️ Multi-State Comparison Tool")
     
+    # Year filter for fair comparison
+    available_years = sorted(df['Year'].dropna().unique())
+    year_options = ["All Years"] + [int(float(y)) if pd.notna(y) else y for y in available_years]
+    
+    selected_year = st.selectbox("📅 Select Year for Comparison:", year_options)
+    
+    # Filter data by year if selected
+    compare_df = df.copy()
+    if selected_year != "All Years":
+        compare_df = compare_df[compare_df['Year'].apply(
+            lambda x: int(float(x)) if pd.notna(x) else None
+        ) == int(selected_year)]
+    
     col1, col2 = st.columns(2)
     with col1:
-        state1 = st.selectbox("🗺️ Select State 1:", df['State'].unique(), index=0)
+        state1 = st.selectbox("🗺️ Select State 1:", compare_df['State'].unique(), index=0)
     with col2:
-        state2 = st.selectbox("🗺️ Select State 2:", df['State'].unique(), index=1 if len(df['State'].unique()) > 1 else 0)
+        state_options = [s for s in compare_df['State'].unique() if s != state1]
+        default_idx = 0 if state_options else 0
+        state2 = st.selectbox("🗺️ Select State 2:", state_options if state_options else compare_df['State'].unique(), 
+                             index=default_idx)
     
     # Comparison logic
-    s1_data = df[df['State'] == state1]
-    s2_data = df[df['State'] == state2]
+    s1_data = compare_df[compare_df['State'] == state1]
+    s2_data = compare_df[compare_df['State'] == state2]
     
+    # Calculate metrics
+    s1_revenue = s1_data['Total_Amount'].sum()
+    s2_revenue = s2_data['Total_Amount'].sum()
+    s1_orders = len(s1_data)
+    s2_orders = len(s2_data)
+    s1_avg = s1_data['Total_Amount'].mean() if not s1_data.empty else 0
+    s2_avg = s2_data['Total_Amount'].mean() if not s2_data.empty else 0
+    s1_qty = s1_data['Qty'].sum()
+    s2_qty = s2_data['Qty'].sum()
+    
+    # Determine winner
+    metrics_comparison = {
+        'Revenue': (s1_revenue, s2_revenue),
+        'Orders': (s1_orders, s2_orders),
+        'Avg Order Value': (s1_avg, s2_avg),
+        'Total Quantity': (s1_qty, s2_qty)
+    }
+    
+    s1_wins = sum(1 for v1, v2 in metrics_comparison.values() if v1 > v2)
+    s2_wins = sum(1 for v1, v2 in metrics_comparison.values() if v2 > v1)
+    
+    # Winner announcement
+    winner_col = st.container()
+    with winner_col:
+        if s1_wins > s2_wins:
+            st.success(f"🏆 **{state1} WINS!** ({s1_wins}/4 metrics) 🎉")
+            st.balloons()
+        elif s2_wins > s1_wins:
+            st.success(f"🏆 **{state2} WINS!** ({s2_wins}/4 metrics) 🎉")
+            st.balloons()
+        else:
+            st.info(f"🤝 **IT'S A TIE!** Both states won 2 metrics each")
+    
+    # Metrics comparison cards
     cols = st.columns(2)
-    for idx, (state, data) in enumerate([(state1, s1_data), (state2, s2_data)]):
+    colors = {'win': '#d4edda', 'lose': '#f8d7da', 'tie': '#fff3cd'}
+    
+    for idx, (state, data, revenue, orders, avg, qty) in enumerate([
+        (state1, s1_data, s1_revenue, s1_orders, s1_avg, s1_qty),
+        (state2, s2_data, s2_revenue, s2_orders, s2_avg, s2_qty)
+    ]):
         with cols[idx]:
             st.markdown(f"### 🏳️ {state}")
-            st.metric("Revenue", f"{CURRENCY}{data['Total_Amount'].sum():,.0f}")
-            st.metric("Orders", f"{len(data)}")
-            st.metric("Avg Order", f"{CURRENCY}{data['Total_Amount'].mean():,.0f}")
-            st.metric("Top Product", data.groupby('Product')['Total_Amount'].sum().idxmax() if not data.empty else "N/A")
+            
+            # Revenue with comparison indicator
+            rev_color = colors['win'] if revenue > s2_revenue else colors['lose'] if revenue < s2_revenue else colors['tie']
+            rev_delta = f"+{CURRENCY}{abs(revenue - s2_revenue):,.0f}" if idx == 0 and revenue > s2_revenue else \
+                       f"-{CURRENCY}{abs(revenue - s2_revenue):,.0f}" if idx == 0 and revenue < s2_revenue else \
+                       f"+{CURRENCY}{abs(revenue - s1_revenue):,.0f}" if idx == 1 and revenue > s1_revenue else \
+                       f"-{CURRENCY}{abs(revenue - s1_revenue):,.0f}" if idx == 1 and revenue < s1_revenue else "Tie"
+            
+            st.metric("💰 Revenue", f"{CURRENCY}{revenue:,.0f}", rev_delta)
+            
+            # Orders
+            ord_delta = f"+{orders - s2_orders}" if idx == 0 and orders > s2_orders else \
+                       f"{orders - s2_orders}" if idx == 0 else \
+                       f"+{orders - s1_orders}" if orders > s1_orders else f"{orders - s1_orders}"
+            st.metric("📦 Orders", f"{orders:,}", ord_delta)
+            
+            # Avg Order
+            st.metric("📊 Avg Order", f"{CURRENCY}{avg:,.0f}")
+            
+            # Top Product
+            top_prod = data.groupby('Product')['Total_Amount'].sum()
+            top_product = top_prod.idxmax() if not top_prod.empty else "N/A"
+            st.metric("🏆 Top Product", top_product)
+            
+            # Market Share
+            total_market = revenue + (s2_revenue if idx == 0 else s1_revenue)
+            share = (revenue / total_market * 100) if total_market > 0 else 0
+            st.progress(min(share / 100, 1.0), text=f"Market Share: {share:.1f}%")
     
-    # Comparison chart with OPPOSITE/CONTRASTING colors
-    comparison_df = pd.DataFrame({
-        state1: s1_data.groupby('Product')['Total_Amount'].sum(),
-        state2: s2_data.groupby('Product')['Total_Amount'].sum()
-    }).fillna(0)
+    st.markdown("---")
     
-    fig = go.Figure()
-    # State 1 - Blue, State 2 - Orange/Red (Opposite colors)
-    fig.add_trace(go.Bar(name=state1, x=comparison_df.index, y=comparison_df[state1], 
-                        marker_color='#1f77b4'))  # Blue
-    fig.add_trace(go.Bar(name=state2, x=comparison_df.index, y=comparison_df[state2], 
-                        marker_color='#ff7f0e'))  # Orange (opposite of blue)
-    fig.update_layout(barmode='group', title='Product-wise Comparison', xaxis_tickangle=-45)
-    st.plotly_chart(fig, use_container_width=True)
-
+    # TABS for different comparisons
+    tab1, tab2, tab3 = st.tabs(["📊 Product-wise", "📅 Month-wise", "📈 Trend Analysis"])
+    
+    with tab1:
+        st.markdown("### 🔧 Product-wise Comparison")
+        comparison_df = pd.DataFrame({
+            state1: s1_data.groupby('Product')['Total_Amount'].sum(),
+            state2: s2_data.groupby('Product')['Total_Amount'].sum()
+        }).fillna(0).reset_index()
+        
+        # Add difference column
+        comparison_df['Difference'] = comparison_df[state1] - comparison_df[state2]
+        comparison_df['Winner'] = comparison_df.apply(
+            lambda x: state1 if x[state1] > x[state2] else state2 if x[state2] > x[state1] else 'Tie', axis=1
+        )
+        
+        # Chart
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            name=f"{state1} 🔵", 
+            x=comparison_df['Product'], 
+            y=comparison_df[state1], 
+            marker_color='#1f77b4'
+        ))
+        fig.add_trace(go.Bar(
+            name=f"{state2} 🟠", 
+            x=comparison_df['Product'], 
+            y=comparison_df[state2], 
+            marker_color='#ff7f0e'
+        ))
+        fig.update_layout(
+            barmode='group', 
+            title='Revenue by Product',
+            xaxis_tickangle=-45,
+            height=500
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Detailed table
+        with st.expander("📋 View Detailed Product Comparison"):
+            display_df = comparison_df.copy()
+            display_df[state1] = display_df[state1].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_df[state2] = display_df[state2].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_df['Difference'] = display_df['Difference'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            st.dataframe(display_df, use_container_width=True)
+    
+    with tab2:
+        st.markdown("### 📅 Month-wise Comparison")
+        
+        # Prepare monthly data
+        s1_monthly = s1_data.groupby(s1_data['Date'].dt.to_period('M')).agg({
+            'Total_Amount': 'sum',
+            'Qty': 'sum'
+        }).reset_index()
+        s1_monthly['Date'] = s1_monthly['Date'].dt.to_timestamp()
+        s1_monthly['Month'] = s1_monthly['Date'].dt.strftime('%b %Y')
+        
+        s2_monthly = s2_data.groupby(s2_data['Date'].dt.to_period('M')).agg({
+            'Total_Amount': 'sum',
+            'Qty': 'sum'
+        }).reset_index()
+        s2_monthly['Date'] = s2_monthly['Date'].dt.to_timestamp()
+        s2_monthly['Month'] = s2_monthly['Date'].dt.strftime('%b %Y')
+        
+        # Merge for comparison
+        monthly_comparison = pd.merge(
+            s1_monthly[['Month', 'Total_Amount', 'Qty']], 
+            s2_monthly[['Month', 'Total_Amount', 'Qty']], 
+            on='Month', 
+            how='outer',
+            suffixes=(f'_{state1}', f'_{state2}')
+        ).fillna(0)
+        
+        # Sort by date
+        monthly_comparison['Sort_Date'] = pd.to_datetime(monthly_comparison['Month'], format='%b %Y')
+        monthly_comparison = monthly_comparison.sort_values('Sort_Date')
+        
+        # Revenue comparison chart
+        fig_rev = go.Figure()
+        fig_rev.add_trace(go.Scatter(
+            x=monthly_comparison['Month'],
+            y=monthly_comparison[f'Total_Amount_{state1}'],
+            name=f"{state1} Revenue",
+            mode='lines+markers',
+            line=dict(color='#1f77b4', width=3),
+            fill='tonexty' if len(monthly_comparison) > 1 else None
+        ))
+        fig_rev.add_trace(go.Scatter(
+            x=monthly_comparison['Month'],
+            y=monthly_comparison[f'Total_Amount_{state2}'],
+            name=f"{state2} Revenue",
+            mode='lines+markers',
+            line=dict(color='#ff7f0e', width=3),
+            fill='tonexty' if len(monthly_comparison) > 1 else None
+        ))
+        fig_rev.update_layout(
+            title='Monthly Revenue Trend Comparison',
+            xaxis_title='Month',
+            yaxis_title=f'Revenue ({CURRENCY})',
+            height=450,
+            hovermode='x unified'
+        )
+        st.plotly_chart(fig_rev, use_container_width=True)
+        
+        # Quantity comparison
+        fig_qty = go.Figure()
+        fig_qty.add_trace(go.Bar(
+            x=monthly_comparison['Month'],
+            y=monthly_comparison[f'Qty_{state1}'],
+            name=f"{state1} Quantity",
+            marker_color='#1f77b4'
+        ))
+        fig_qty.add_trace(go.Bar(
+            x=monthly_comparison['Month'],
+            y=monthly_comparison[f'Qty_{state2}'],
+            name=f"{state2} Quantity",
+            marker_color='#ff7f0e'
+        ))
+        fig_qty.update_layout(
+            title='Monthly Quantity Comparison',
+            barmode='group',
+            xaxis_title='Month',
+            yaxis_title='Quantity',
+            height=400
+        )
+        st.plotly_chart(fig_qty, use_container_width=True)
+        
+        # Monthly winner summary
+        st.markdown("### 🏆 Monthly Winners")
+        monthly_comparison['Revenue_Winner'] = monthly_comparison.apply(
+            lambda x: state1 if x[f'Total_Amount_{state1}'] > x[f'Total_Amount_{state2}'] 
+            else state2 if x[f'Total_Amount_{state2}'] > x[f'Total_Amount_{state1}'] 
+            else 'Tie', axis=1
+        )
+        
+        win_cols = st.columns(4)
+        s1_month_wins = (monthly_comparison['Revenue_Winner'] == state1).sum()
+        s2_month_wins = (monthly_comparison['Revenue_Winner'] == state2).sum()
+        ties = (monthly_comparison['Revenue_Winner'] == 'Tie').sum()
+        
+        with win_cols[0]:
+            st.metric(f"🔵 {state1} Wins", f"{s1_month_wins} months")
+        with win_cols[1]:
+            st.metric(f"🟠 {state2} Wins", f"{s2_month_wins} months")
+        with win_cols[2]:
+            st.metric("🤝 Ties", f"{ties} months")
+        with win_cols[3]:
+            total_months = len(monthly_comparison)
+            st.metric("📊 Total Months", total_months)
+        
+        # Show monthly breakdown table
+        with st.expander("📋 View Monthly Breakdown"):
+            display_monthly = monthly_comparison[['Month', f'Total_Amount_{state1}', f'Total_Amount_{state2}', 
+                                                  f'Qty_{state1}', f'Qty_{state2}', 'Revenue_Winner']].copy()
+            display_monthly[f'Total_Amount_{state1}'] = display_monthly[f'Total_Amount_{state1}'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_monthly[f'Total_Amount_{state2}'] = display_monthly[f'Total_Amount_{state2}'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            st.dataframe(display_monthly, use_container_width=True)
+    
+    with tab3:
+        st.markdown("### 📈 Comprehensive Trend Analysis")
+        
+        # Growth rate calculation
+        if len(s1_monthly) >= 2 and len(s2_monthly) >= 2:
+            s1_growth = ((s1_monthly['Total_Amount'].iloc[-1] - s1_monthly['Total_Amount'].iloc[0]) / 
+                        s1_monthly['Total_Amount'].iloc[0] * 100)
+            s2_growth = ((s2_monthly['Total_Amount'].iloc[-1] - s2_monthly['Total_Amount'].iloc[0]) / 
+                        s2_monthly['Total_Amount'].iloc[0] * 100)
+            
+            growth_cols = st.columns(2)
+            with growth_cols[0]:
+                growth_color = "normal" if s1_growth > 0 else "inverse"
+                st.metric(f"{state1} Growth Rate", f"{s1_growth:+.1f}%", delta_color=growth_color)
+            with growth_cols[1]:
+                growth_color = "normal" if s2_growth > 0 else "inverse"
+                st.metric(f"{state2} Growth Rate", f"{s2_growth:+.1f}%", delta_color=growth_color)
+        
+        # Cumulative revenue comparison
+        s1_data_sorted = s1_data.sort_values('Date')
+        s2_data_sorted = s2_data.sort_values('Date')
+        s1_data_sorted['Cumulative'] = s1_data_sorted['Total_Amount'].cumsum()
+        s2_data_sorted['Cumulative'] = s2_data_sorted['Total_Amount'].cumsum()
+        
+        fig_cum = go.Figure()
+        fig_cum.add_trace(go.Scatter(
+            x=s1_data_sorted['Date'],
+            y=s1_data_sorted['Cumulative'],
+            name=f"{state1} Cumulative",
+            line=dict(color='#1f77b4', width=3)
+        ))
+        fig_cum.add_trace(go.Scatter(
+            x=s2_data_sorted['Date'],
+            y=s2_data_sorted['Cumulative'],
+            name=f"{state2} Cumulative",
+            line=dict(color='#ff7f0e', width=3)
+        ))
+        fig_cum.update_layout(
+            title='Cumulative Revenue Over Time',
+            xaxis_title='Date',
+            yaxis_title=f'Cumulative Revenue ({CURRENCY})',
+            height=450
+        )
+        st.plotly_chart(fig_cum, use_container_width=True)
+        
+        # Performance radar chart (if enough data)
+        categories = ['Revenue', 'Orders', 'Quantity', 'Avg Order', 'Products Sold']
+        s1_values = [
+            s1_revenue / max(s1_revenue, s2_revenue) * 100 if max(s1_revenue, s2_revenue) > 0 else 0,
+            s1_orders / max(s1_orders, s2_orders) * 100 if max(s1_orders, s2_orders) > 0 else 0,
+            s1_qty / max(s1_qty, s2_qty) * 100 if max(s1_qty, s2_qty) > 0 else 0,
+            s1_avg / max(s1_avg, s2_avg) * 100 if max(s1_avg, s2_avg) > 0 else 0,
+            len(s1_data['Product'].unique()) / max(len(s1_data['Product'].unique()), len(s2_data['Product'].unique())) * 100
+        ]
+        s2_values = [
+            s2_revenue / max(s1_revenue, s2_revenue) * 100 if max(s1_revenue, s2_revenue) > 0 else 0,
+            s2_orders / max(s1_orders, s2_orders) * 100 if max(s1_orders, s2_orders) > 0 else 0,
+            s2_qty / max(s1_qty, s2_qty) * 100 if max(s1_qty, s2_qty) > 0 else 0,
+            s2_avg / max(s1_avg, s2_avg) * 100 if max(s1_avg, s2_avg) > 0 else 0,
+            len(s2_data['Product'].unique()) / max(len(s1_data['Product'].unique()), len(s2_data['Product'].unique())) * 100
+        ]
+        
+        fig_radar = go.Figure()
+        fig_radar.add_trace(go.Scatterpolar(
+            r=s1_values + [s1_values[0]],
+            theta=categories + [categories[0]],
+            fill='toself',
+            name=f'{state1} 🔵',
+            line_color='#1f77b4'
+        ))
+        fig_radar.add_trace(go.Scatterpolar(
+            r=s2_values + [s2_values[0]],
+            theta=categories + [categories[0]],
+            fill='toself',
+            name=f'{state2} 🟠',
+            line_color='#ff7f0e'
+        ))
+        fig_radar.update_layout(
+            polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+            showlegend=True,
+            title='Performance Comparison (Normalized)',
+            height=500
+        )
+        st.plotly_chart(fig_radar, use_container_width=True)
 # ==========================================
 # REPORT 6: REVENUE TRENDS (ENHANCED)
 # ==========================================

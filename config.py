@@ -8,4 +8,4 @@ CREDENTIALS_FILE = "credentials/service_account.json"
 # Dashboard Settings
 DASHBOARD_TITLE = "📊 Order Confirmation Live Dashboard"
 CURRENCY = "₹"
-REFRESH_INTERVAL = 3600 # 5 minutes
+REFRESH_INTERVAL = 3600 # 60 minutes
