@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from data_loader import OrderDataLoader
-from config import DASHBOARD_TITLE, CURRENCY
+from config import DASHBOARD_TITLE, CURRENCY, BRUSH_SHEET_NAME
 import numpy as np
 from datetime import datetime, timedelta
 
@@ -98,6 +98,20 @@ st.markdown("""
         color: black !important;
         font-weight: 600 !important;
     }
+    
+    /* Brush Dashboard Specific Styles */
+    .brush-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        border-radius: 15px;
+        color: white;
+        margin-bottom: 20px;
+    }
+    
+    .urgency-overdue { background-color: #ffebee; color: #c62828; padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+    .urgency-week { background-color: #fff3e0; color: #ef6c00; padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+    .urgency-month { background-color: #fffde7; color: #f9a825; padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+    .urgency-future { background-color: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 12px; font-weight: bold; }
 
 </style>
 """, unsafe_allow_html=True)
@@ -155,6 +169,7 @@ report_categories = {
     "🔧 Products": ["🔧 Product Performance", "🔧 Product Trends", "🔧 Best Sellers by State"],
     "🏢 Companies": ["🏢 Company Analysis", "🏢 Customer Segmentation"],
     "⚡ Operations": ["⚡ Lead Time Analysis"],
+    "🧹 Brush System": ["🧹 Brush Follow-up Dashboard"],  # NEW SECTION
     "📥 Export": ["📋 Raw Data Explorer"]
 }
 
@@ -205,9 +220,268 @@ st.caption(f"🔄 Live Data | 📊 {len(df):,} records | 🕒 Updated: {datetime
 st.markdown("---")
 
 # ==========================================
+# REPORT: BRUSH FOLLOW-UP DASHBOARD (NEW)
+# ==========================================
+if report == "🧹 Brush Follow-up Dashboard":
+    st.markdown("""
+    <div class="brush-header">
+        <h2>🧹 Broomer / Sweeper / Brush Set - Follow-up System</h2>
+        <p>Track brush set purchases and manage 3-month replacement follow-ups</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Process brush data
+    brush_df = loader.identify_brush_products(df)
+    
+    if brush_df.empty:
+        st.warning("No Broomer, Sweeper, or Brush products found in the current dataset.")
+        st.stop()
+    
+    # Calculate follow-up dates
+    brush_df = loader.calculate_followup_dates(brush_df)
+    brush_stats = loader.get_brush_summary_stats(brush_df)
+    
+    # ==================== MINI DASHBOARD METRICS ====================
+    st.markdown("### 📊 Quick Overview")
+    
+    metric_cols = st.columns(5)
+    with metric_cols[0]:
+        st.metric("🧹 Total Units", f"{brush_stats['total_units']:,}")
+    with metric_cols[1]:
+        st.metric("💰 Total Revenue", f"{CURRENCY}{brush_stats['total_revenue']:,.0f}")
+    with metric_cols[2]:
+        st.metric("🏢 Unique Companies", f"{brush_stats['unique_companies']}")
+    with metric_cols[3]:
+        st.metric("⚠️ Overdue Follow-ups", f"{brush_stats['overdue_count']}", 
+                 delta="Action Needed" if brush_stats['overdue_count'] > 0 else None,
+                 delta_color="inverse")
+    with metric_cols[4]:
+        st.metric("📅 Due This Month", f"{brush_stats['upcoming_count']}")
+    
+    st.markdown("---")
+    
+    # ==================== TABS FOR ORGANIZATION ====================
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Follow-up Reminders", "📈 Analytics", "🔍 Search & Filter", "💾 Data Management"])
+    
+    # ==================== TAB 1: FOLLOW-UP REMINDERS ====================
+    with tab1:
+        st.markdown("### 📋 Follow-up Reminder Table")
+        st.info("Brush sets need replacement after 90 days. Below is the automatic follow-up schedule based on purchase dates.")
+        
+        # Create display table
+        display_df = brush_df[[
+            'Date', 'Company', 'Client_Name', 'Product', 'State', 
+            'Follow_Up_Date', 'Days_Until_Followup', 'Urgency', 'Inquiry_No'
+        ]].copy()
+        
+        # Rename columns for display
+        display_df.columns = [
+            'Purchase Date', 'Company Name', 'Client Name', 'Product', 'State',
+            'Follow-up Date', 'Days Left', 'Status', 'Inquiry No'
+        ]
+        
+        # Format dates
+        display_df['Purchase Date'] = display_df['Purchase Date'].dt.strftime('%d-%m-%Y')
+        display_df['Follow-up Date'] = display_df['Follow-up Date'].dt.strftime('%d-%m-%Y')
+        
+        # Sort by urgency (overdue first)
+        urgency_order = {'🔴 Overdue': 0, '🟠 Due This Week': 1, '🟡 Due This Month': 2, '🟢 Future': 3}
+        display_df['Sort_Priority'] = brush_df['Urgency'].map(urgency_order)
+        display_df = display_df.sort_values('Sort_Priority').drop('Sort_Priority', axis=1)
+        
+        # Filter options
+        col1, col2 = st.columns(2)
+        with col1:
+            status_filter = st.multiselect("Filter by Status:", 
+                                          options=display_df['Status'].unique(),
+                                          default=display_df['Status'].unique())
+        with col2:
+            search_company = st.text_input("Search Company:", placeholder="Type company name...")
+        
+        # Apply filters
+        filtered_display = display_df[display_df['Status'].isin(status_filter)]
+        if search_company:
+            filtered_display = filtered_display[filtered_display['Company Name'].str.contains(search_company, case=False)]
+        
+        # Display styled table
+        if not filtered_display.empty:
+            # Color coding for status
+            def color_status(val):
+                if '🔴' in val:
+                    return 'background-color: #ffebee; color: #c62828; font-weight: bold;'
+                elif '🟠' in val:
+                    return 'background-color: #fff3e0; color: #ef6c00; font-weight: bold;'
+                elif '🟡' in val:
+                    return 'background-color: #fffde7; color: #f9a825; font-weight: bold;'
+                else:
+                    return 'background-color: #e8f5e9; color: #2e7d32; font-weight: bold;'
+            
+            styled_df = filtered_display.style.applymap(color_status, subset=['Status'])
+            st.dataframe(styled_df, use_container_width=True, height=500)
+            
+            # Summary for filtered view
+            st.caption(f"Showing {len(filtered_display)} of {len(display_df)} total records")
+        else:
+            st.warning("No records match your filter criteria.")
+    
+    # ==================== TAB 2: ANALYTICS ====================
+    with tab2:
+        st.markdown("### 📈 Brush Product Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Urgency Distribution
+            st.markdown("#### ⏰ Follow-up Status Distribution")
+            urgency_data = brush_df['Urgency'].value_counts().reset_index()
+            urgency_data.columns = ['Status', 'Count']
+            
+            fig_urgency = px.pie(urgency_data, values='Count', names='Status', 
+                                color_discrete_map={
+                                    '🔴 Overdue': '#c62828',
+                                    '🟠 Due This Week': '#ef6c00',
+                                    '🟡 Due This Month': '#f9a825',
+                                    '🟢 Future': '#2e7d32'
+                                },
+                                hole=0.4)
+            fig_urgency.update_traces(textinfo='percent+label', textposition='outside')
+            st.plotly_chart(fig_urgency, use_container_width=True)
+        
+        with col2:
+            # Top Products
+            st.markdown("#### 🏆 Top Brush Products")
+            top_products = brush_df['Product'].value_counts().head(10).reset_index()
+            top_products.columns = ['Product', 'Units Sold']
+            
+            fig_products = px.bar(top_products, y='Product', x='Units Sold', 
+                                 orientation='h', color='Units Sold',
+                                 color_continuous_scale='Viridis')
+            fig_products.update_layout(yaxis=dict(autorange="reversed"))
+            st.plotly_chart(fig_products, use_container_width=True)
+        
+        # Timeline view
+        st.markdown("#### 📅 Follow-up Timeline")
+        timeline_df = brush_df.copy()
+        timeline_df['Month'] = timeline_df['Follow_Up_Date'].dt.strftime('%Y-%m')
+        monthly_followups = timeline_df.groupby(['Month', 'Urgency']).size().reset_index(name='Count')
+        
+        fig_timeline = px.bar(monthly_followups, x='Month', y='Count', color='Urgency',
+                             color_discrete_map={
+                                 '🔴 Overdue': '#c62828',
+                                 '🟠 Due This Week': '#ef6c00',
+                                 '🟡 Due This Month': '#f9a825',
+                                 '🟢 Future': '#2e7d32'
+                             },
+                             barmode='stack')
+        fig_timeline.update_layout(xaxis_title="Follow-up Month", yaxis_title="Number of Follow-ups")
+        st.plotly_chart(fig_timeline, use_container_width=True)
+        
+        # State-wise analysis
+        st.markdown("#### 🗺️ State-wise Brush Sales")
+        state_brush = brush_df.groupby('State').agg({
+            'Total_Amount': 'sum',
+            'Company': 'nunique',
+            'Inquiry_No': 'count'
+        }).reset_index()
+        state_brush.columns = ['State', 'Revenue', 'Companies', 'Units']
+        
+        fig_state = px.scatter(state_brush, x='Companies', y='Revenue', size='Units',
+                              color='Revenue', hover_name='State',
+                              color_continuous_scale='Plasma')
+        fig_state.update_layout(xaxis_title="Number of Companies", yaxis_title=f"Revenue ({CURRENCY})")
+        st.plotly_chart(fig_state, use_container_width=True)
+    
+    # ==================== TAB 3: SEARCH & FILTER ====================
+    with tab3:
+        st.markdown("### 🔍 Advanced Search")
+        
+        # Advanced filters
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            filter_state = st.multiselect("Select States:", options=sorted(brush_df['State'].unique()))
+        with col2:
+            filter_product = st.multiselect("Select Products:", options=sorted(brush_df['Product'].unique()))
+        with col3:
+            date_range = st.date_input("Purchase Date Range:", 
+                                      [brush_df['Date'].min(), brush_df['Date'].max()])
+        
+        # Apply advanced filters
+        search_result = brush_df.copy()
+        if filter_state:
+            search_result = search_result[search_result['State'].isin(filter_state)]
+        if filter_product:
+            search_result = search_result[search_result['Product'].isin(filter_product)]
+        if len(date_range) == 2:
+            search_result = search_result[(search_result['Date'] >= pd.Timestamp(date_range[0])) & 
+                                         (search_result['Date'] <= pd.Timestamp(date_range[1]))]
+        
+        if not search_result.empty:
+            st.success(f"Found {len(search_result)} records matching your criteria")
+            st.dataframe(search_result[[
+                'Date', 'Company', 'Client_Name', 'Product', 'State', 
+                'Total_Amount', 'Follow_Up_Date', 'Urgency'
+            ]].style.format({
+                'Date': lambda x: x.strftime('%d-%m-%Y'),
+                'Follow_Up_Date': lambda x: x.strftime('%d-%m-%Y'),
+                'Total_Amount': lambda x: f"{CURRENCY}{x:,.0f}"
+            }), use_container_width=True)
+            
+            # Export option for filtered data
+            csv = search_result.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Download Filtered Data as CSV",
+                data=csv,
+                file_name=f"brush_followups_{datetime.now().strftime('%Y%m%d')}.csv",
+                mime='text/csv'
+            )
+        else:
+            st.warning("No records found matching your criteria.")
+    
+    # ==================== TAB 4: DATA MANAGEMENT ====================
+    with tab4:
+        st.markdown("### 💾 Store to Google Sheets")
+        st.info(f"This will store all {len(brush_df)} brush product records to the '{BRUSH_SHEET_NAME}' sheet in your Google Spreadsheet.")
+        
+        # Show preview of what will be stored
+        with st.expander("👁️ Preview Data to be Stored"):
+            preview_df = brush_df[[
+                'Date', 'Inquiry_No', 'Company', 'Client_Name', 'Product', 
+                'State', 'Total_Amount', 'Follow_Up_Date', 'Urgency'
+            ]].copy()
+            preview_df['Date'] = preview_df['Date'].dt.strftime('%d-%m-%Y')
+            preview_df['Follow_Up_Date'] = preview_df['Follow_Up_Date'].dt.strftime('%d-%m-%Y')
+            st.dataframe(preview_df.head(10), use_container_width=True)
+            st.caption(f"Showing first 10 of {len(brush_df)} records")
+        
+        # Store button
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            if st.button("🚀 Store to Sheet", type="primary", use_container_width=True):
+                with st.spinner("Storing data to Google Sheets..."):
+                    success, message = loader.store_to_brush_sheet(brush_df)
+                    if success:
+                        st.success(message)
+                        st.balloons()
+                    else:
+                        st.error(message)
+        
+        with col2:
+            # Check existing data
+            existing_data = loader.fetch_existing_brush_data()
+            if existing_data is not None and not existing_data.empty:
+                st.info(f"ℹ️ Sheet currently contains {len(existing_data)} records. Storing will update with latest data from Order Confirmation sheet.")
+            else:
+                st.info("ℹ️ No existing data found in the sheet. This will create a new entry.")
+        
+        # Show existing data if available
+        if existing_data is not None and not existing_data.empty:
+            st.markdown("### 📋 Currently Stored Data")
+            st.dataframe(existing_data, use_container_width=True, height=300)
+
+# ==========================================
 # REPORT 1: EXECUTIVE DASHBOARD
 # ==========================================
-if report == "🏠 Executive Dashboard":
+elif report == "🏠 Executive Dashboard":
     st.markdown("## 🎯 Executive Overview")
     
     # Get unique years safely, handling both int and float formats
@@ -1255,11 +1529,9 @@ elif report == "💰 Revenue Trends":
         xaxis_tickangle=-45
     )
     st.plotly_chart(fig_cum, use_container_width=True)
+
 # ==========================================
 # REPORT 7: YEAR-WISE ANALYSIS
-# ==========================================
-# ==========================================
-# REPORT 7: YEAR-WISE ANALYSIS (IMPROVED WITH CHART)
 # ==========================================
 elif report == "💰 Year-wise Analysis":
     st.markdown("## 💰 Year-over-Year Growth Analysis")
@@ -1410,9 +1682,7 @@ elif report == "💰 Year-wise Analysis":
             'Quantity': lambda x: f"{int(x)}"
         }))
     
-    # ==========================================
-    # ALL YEARS LINE CHART SECTION (NEW)
-    # ==========================================
+    # All Years Line Chart
     if len(available_years) >= 2:
         st.markdown("---")
         st.markdown("### 📈 All Years Growth Trend")
@@ -1487,21 +1757,10 @@ elif report == "💰 Year-wise Analysis":
             'Order Growth': yearly_growth['Orders_Growth_Pct'].apply(lambda x: f"{x:+.2f}%" if pd.notna(x) else "-")
         })
         st.table(summary_df.set_index('Year'))
-    
-    # Historical Overview table (if 3+ years)
-    if len(available_years) >= 3:
-        st.markdown("---")
-        st.markdown("### 📋 All Years Historical Data")
-        
-        hist_df = yearly_stats.reset_index()
-        hist_df['Growth_vs_Previous'] = hist_df['Total_Revenue'].pct_change() * 100
-        
-        display_hist = hist_df[['Year', 'Total_Revenue', 'Total_Orders', 'Avg_Order_Value', 'Growth_vs_Previous']].copy()
-        display_hist['Total_Revenue'] = display_hist['Total_Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
-        display_hist['Avg_Order_Value'] = display_hist['Avg_Order_Value'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
-        display_hist['Growth_vs_Previous'] = display_hist['Growth_vs_Previous'].apply(lambda x: f"{x:+.2f}%" if pd.notna(x) else "-")
-        
-        st.table(display_hist.set_index('Year'))
+
+# ==========================================
+# REPORT 8: MONTHLY INSIGHTS (FIXED)
+# ==========================================
 elif report == "💰 Monthly Insights":
     st.markdown("## 💰 Monthly Deep Dive & Seasonal Analysis")
     
@@ -1650,23 +1909,9 @@ elif report == "💰 Monthly Insights":
         for idx, year in enumerate(selected_years):
             with cols[idx]:
                 st.metric(f"{year}", f"{CURRENCY}{totals[year]:,.0f}")
-    
-    with tab2:
-        display_ord = pivot_orders.copy()
-        for year in selected_years:
-            if year in display_ord.columns:
-                display_ord[year] = display_ord[year].apply(lambda x: f"{int(x)}" if x > 0 else "-")
-        
-        if len(selected_years) == 2:
-            y1, y2 = sorted(selected_years)
-            if y1 in pivot_orders.columns and y2 in pivot_orders.columns:
-                growth_ord = ((pivot_orders[y2] - pivot_orders[y1]) / pivot_orders[y1] * 100).round(1)
-                display_ord['Growth %'] = growth_ord.apply(lambda x: f"{x:+.1f}%" if pd.notna(x) and x != 0 else "-")
-        
-        st.table(display_ord)
 
     # ==========================================
-    # YEAR-WISE SUMMARY SECTION (NEW ADDITION)
+    # YEAR-WISE SUMMARY SECTION
     # ==========================================
     st.markdown("---")
     st.markdown("### 🗓️ Year-wise Performance Summary")
@@ -1750,7 +1995,7 @@ elif report == "💰 Monthly Insights":
             )
     
     # ==========================================
-    # YEAR-WISE COMPARISON TABLE (NEW ADDITION)
+    # YEAR-WISE COMPARISON TABLE
     # ==========================================
     st.markdown("#### 📋 Year-wise Detailed Comparison")
     
@@ -1775,7 +2020,7 @@ elif report == "💰 Monthly Insights":
     st.table(display_yearly.set_index('Year').transpose())
     
     # ==========================================
-    # YEAR-WISE VISUAL TRENDS (NEW ADDITION)
+    # YEAR-WISE VISUAL TRENDS
     # ==========================================
     st.markdown("#### 📊 Year-wise Trend Visualization")
     
@@ -1860,86 +2105,7 @@ elif report == "💰 Monthly Insights":
             margin=dict(l=50, r=50, t=80, b=50)
         )
         st.plotly_chart(fig_year_combo, use_container_width=True)
-    
-    # ==========================================
-    # CUMULATIVE PERFORMANCE (NEW ADDITION)
-    # ==========================================
-    if len(selected_years) > 1:
-        st.markdown("#### 📊 Cumulative Multi-Year Performance")
-        
-        total_revenue_all = yearly_summary['Total_Amount'].sum()
-        total_orders_all = yearly_summary['Inquiry_No'].sum()
-        avg_revenue_per_year = yearly_summary['Total_Amount'].mean()
-        
-        cum_cols = st.columns(4)
-        with cum_cols[0]:
-            st.metric(
-                "Combined Revenue",
-                f"{CURRENCY}{total_revenue_all:,.0f}",
-                f"{len(selected_years)} years"
-            )
-        with cum_cols[1]:
-            st.metric(
-                "Combined Orders",
-                f"{int(total_orders_all)}",
-                f"{len(selected_years)} years"
-            )
-        with cum_cols[2]:
-            st.metric(
-                "Yearly Average Revenue",
-                f"{CURRENCY}{avg_revenue_per_year:,.0f}",
-                "per year"
-            )
-        with cum_cols[3]:
-            best_year = yearly_summary.loc[yearly_summary['Total_Amount'].idxmax(), 'Year']
-            best_rev = yearly_summary['Total_Amount'].max()
-            st.metric(
-                "Best Performing Year",
-                f"{int(best_year)}",
-                f"{CURRENCY}{best_rev:,.0f}"
-            )
 
-    # ==========================================
-    # MONTH-OVER-MONTH GROWTH (Latest Year)
-    # ==========================================
-    st.markdown("---")
-    latest_year = max(selected_years)
-    
-    # FIX: Properly sort by month order
-    latest_data = monthly_data[monthly_data['Year'] == latest_year].copy()
-    if not latest_data.empty:
-        latest_data['Month_Num'] = latest_data['Month_Name'].apply(
-            lambda x: month_order.index(x) if x in month_order else 0
-        )
-        latest_data = latest_data.sort_values('Month_Num')
-        
-        if len(latest_data) > 1:
-            st.markdown(f"### 📈 {latest_year} Month-over-Month Growth")
-            
-            latest_data['MoM_Revenue_Growth'] = latest_data['Total_Amount'].pct_change() * 100
-            latest_data['MoM_Order_Growth'] = latest_data['Inquiry_No'].pct_change() * 100
-            
-            # Display as metric cards
-            mom_cols = st.columns(min(len(latest_data), 6))  # Max 6 columns
-            for idx, (_, row) in enumerate(latest_data.iterrows()):
-                if idx < 6:  # Show first 6 months
-                    with mom_cols[idx]:
-                        rev_growth = row['MoM_Revenue_Growth']
-                        if pd.notna(rev_growth):
-                            delta_color = "normal" if rev_growth > 0 else "inverse"
-                            st.metric(
-                                label=f"{row['Month_Name'][:3]}",
-                                value=f"{CURRENCY}{row['Total_Amount']/1000:.0f}K",
-                                delta=f"{rev_growth:+.1f}%",
-                                delta_color=delta_color
-                            )
-                        else:
-                            st.metric(
-                                label=f"{row['Month_Name'][:3]}",
-                                value=f"{CURRENCY}{row['Total_Amount']/1000:.0f}K",
-                                delta="Base"
-                            )
-    
     # ==========================================
     # SEASONAL INSIGHTS
     # ==========================================
@@ -1964,6 +2130,7 @@ elif report == "💰 Monthly Insights":
         for i, (month, revenue) in enumerate(all_months.head(3).items(), 1):
             pct = (revenue / all_months.sum()) * 100
             st.write(f"{i}. **{month}**: {CURRENCY}{revenue:,.0f} ({pct:.1f}% of total)")
+
 # ==========================================
 # REPORT 9: TOP REVENUE SOURCES (ENHANCED)
 # ==========================================
@@ -2173,136 +2340,6 @@ elif report == "💰 Top Revenue Sources":
     with cols[3]:
         st.metric("📦 Long Tail Products", f"{len(product_revenue) - len(pareto_80_idx)}", 
                  f"{(product_revenue_sorted.tail(len(product_revenue) - len(pareto_80_idx))['Revenue_Pct'].sum()):.1f}% revenue")
-    
-    st.markdown("---")
-    
-    # ==========================================
-    # PARETO ANALYSIS (80/20 RULE) - ENHANCED
-    # ==========================================
-    st.markdown("### 📊 Pareto Analysis (80/20 Rule) - Deep Dive")
-    
-    tab1, tab2 = st.tabs(["🗺️ State Pareto", "🔧 Product Pareto"])
-    
-    with tab1:
-        st.markdown("#### State-wise Pareto Chart")
-        
-        # State pareto data
-        state_pareto = state_revenue.sort_values('Revenue', ascending=False).copy()
-        state_pareto['Cumulative_Revenue'] = state_pareto['Revenue'].cumsum()
-        state_pareto['Cumulative_Pct'] = (state_pareto['Cumulative_Revenue'] / total_revenue * 100)
-        
-        col1, col2 = st.columns([3, 2])
-        
-        with col1:
-            # Pareto Chart
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            
-            fig.add_trace(
-                go.Bar(x=state_pareto.index, y=state_pareto['Revenue'], 
-                      name='Revenue', marker_color='royalblue'),
-                secondary_y=False,
-            )
-            
-            fig.add_trace(
-                go.Scatter(x=state_pareto.index, y=state_pareto['Cumulative_Pct'], 
-                          name='Cumulative %', mode='lines+markers', 
-                          line=dict(color='red', width=3)),
-                secondary_y=True,
-            )
-            
-            # Add 80% reference line
-            fig.add_hline(y=80, line_dash="dash", line_color="green", 
-                         annotation_text="80% Target", secondary_y=True)
-            
-            fig.update_yaxes(title_text=f"Revenue ({CURRENCY})", secondary_y=False)
-            fig.update_yaxes(title_text="Cumulative %", range=[0, 105], secondary_y=True)
-            fig.update_layout(height=450, xaxis_tickangle=-45, 
-                            legend=dict(orientation="h", yanchor="bottom", y=1.02))
-            st.plotly_chart(fig, use_container_width=True)
-        
-        with col2:
-            st.markdown("#### Pareto Insights (States)")
-            
-            # Find which states contribute to 80%
-            states_80 = state_pareto[state_pareto['Cumulative_Pct'] <= 80]
-            states_90 = state_pareto[state_pareto['Cumulative_Pct'] <= 90]
-            
-            st.write(f"**⭐ Vital Few (80% revenue):**")
-            st.write(f"{len(states_80)} states ({len(states_80)/len(state_pareto)*100:.1f}%)")
-            for i, (state, row) in enumerate(states_80.head(5).iterrows(), 1):
-                st.write(f"{i}. {state}: {row['Revenue_Pct']:.1f}%")
-            
-            st.write(f"\n**💎 Useful Many (80-90%):**")
-            st.write(f"{len(states_90) - len(states_80)} states")
-            
-            st.write(f"\n**📦 Long Tail (10%):**")
-            st.write(f"{len(state_pareto) - len(states_90)} states")
-            
-            st.metric("Concentration Ratio", f"{states_80.iloc[0]['Revenue_Pct']:.1f}%", 
-                     f"Top state: {states_80.index[0]}")
-    
-    with tab2:
-        st.markdown("#### Product-wise Pareto Chart")
-        
-        # Product pareto data
-        prod_pareto = product_revenue.sort_values('Revenue', ascending=False).copy()
-        prod_pareto['Cumulative_Revenue'] = prod_pareto['Revenue'].cumsum()
-        prod_pareto['Cumulative_Pct'] = (prod_pareto['Cumulative_Revenue'] / total_revenue * 100)
-        
-        # Show only top 20 for clarity
-        prod_pareto_top = prod_pareto.head(20)
-        
-        col1, col2 = st.columns([3, 2])
-        
-        with col1:
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            
-            fig.add_trace(
-                go.Bar(x=prod_pareto_top.index, y=prod_pareto_top['Revenue'], 
-                      name='Revenue', marker_color='darkgreen'),
-                secondary_y=False,
-            )
-            
-            fig.add_trace(
-                go.Scatter(x=prod_pareto_top.index, y=prod_pareto_top['Cumulative_Pct'], 
-                          name='Cumulative %', mode='lines+markers',
-                          line=dict(color='orange', width=3)),
-                secondary_y=True,
-            )
-            
-            fig.add_hline(y=80, line_dash="dash", line_color="red", 
-                         annotation_text="80%", secondary_y=True)
-            
-            fig.update_yaxes(title_text=f"Revenue ({CURRENCY})", secondary_y=False)
-            fig.update_yaxes(title_text="Cumulative %", range=[0, 105], secondary_y=True)
-            fig.update_layout(height=450, xaxis_tickangle=-45,
-                            legend=dict(orientation="h", yanchor="bottom", y=1.02))
-            st.plotly_chart(fig, use_container_width=True)
-        
-        with col2:
-            st.markdown("#### Pareto Insights (Products)")
-            
-            prods_80 = prod_pareto[prod_pareto['Cumulative_Pct'] <= 80]
-            prods_90 = prod_pareto[prod_pareto['Cumulative_Pct'] <= 90]
-            
-            st.write(f"**⭐ Vital Few:**")
-            st.write(f"{len(prods_80)} products ({len(prods_80)/len(prod_pareto)*100:.1f}%) make 80% revenue")
-            
-            st.write(f"\n**📊 Distribution:**")
-            st.write(f"• Top 5: {prod_pareto.head(5)['Revenue_Pct'].sum():.1f}%")
-            st.write(f"• Top 10: {prod_pareto.head(10)['Revenue_Pct'].sum():.1f}%")
-            st.write(f"• Top 20: {prod_pareto.head(20)['Revenue_Pct'].sum():.1f}%")
-            
-            # ABC Classification
-            prod_pareto['Class'] = prod_pareto['Cumulative_Pct'].apply(
-                lambda x: 'A (Top 80%)' if x <= 80 else ('B (80-95%)' if x <= 95 else 'C (Bottom 5%)')
-            )
-            
-            abc_counts = prod_pareto['Class'].value_counts()
-            st.write(f"\n**🎯 ABC Classification:**")
-            for cls, count in abc_counts.items():
-                st.write(f"• {cls}: {count} products")
-
 
 # ==========================================
 # REPORT 10: PRODUCT PERFORMANCE (NUMERIC FOCUS)
@@ -2371,42 +2408,6 @@ elif report == "🔧 Product Performance":
         'Unique_Customers': 'Customers',
         'States_Present': 'States'
     }))
-    
-    st.markdown("---")
-    
-    # PERFORMANCE TIERS (ABC Analysis)
-    st.markdown("### 📈 Performance Tiers (ABC Analysis)")
-    
-    # Calculate tiers based on market share
-    product_stats['Cumulative_Share'] = product_stats['Market_Share_Pct'].cumsum()
-    
-    def get_tier(cum_pct):
-        if cum_pct <= 80:
-            return '⭐ Star (Top 80%)'
-        elif cum_pct <= 95:
-            return '💎 Premium (80-95%)'
-        else:
-            return '📦 Regular (Bottom 5%)'
-    
-    product_stats['Tier'] = product_stats['Cumulative_Share'].apply(get_tier)
-    
-    # Show tier summary
-    tier_summary = product_stats.groupby('Tier').agg({
-        'Total_Revenue': ['sum', 'count'],
-        'Total_Orders': 'sum',
-        'Total_Qty': 'sum'
-    }).round(2)
-    
-    tier_cols = st.columns(3)
-    tier_colors = {'⭐ Star (Top 80%)': 'green', '💎 Premium (80-95%)': 'orange', '📦 Regular (Bottom 5%)': 'gray'}
-    
-    for idx, (tier, row) in enumerate(tier_summary.iterrows()):
-        with tier_cols[idx]:
-            st.markdown(f"**{tier}**")
-            st.write(f"Products: **{int(row[('Total_Revenue', 'count')])}**")
-            st.write(f"Revenue: **{CURRENCY}{row[('Total_Revenue', 'sum')]:,.0f}**")
-            st.write(f"Orders: **{int(row[('Total_Orders', 'sum')])}**")
-            st.write(f"Share: **{row[('Total_Revenue', 'sum')]/total_market_revenue*100:.1f}%**")
     
     st.markdown("---")
     
@@ -2485,12 +2486,12 @@ elif report == "🔧 Product Performance":
                 'Total_Revenue': lambda x: f"{CURRENCY}{x:,.0f}",
                 'Avg_Order_Value': lambda x: f"{CURRENCY}{x:,.0f}",
                 'Revenue_Per_Customer': lambda x: f"{CURRENCY}{x:,.0f}",
-                'Market_Share_Pct': lambda x: f"{x:.2f}%",
-                'Cumulative_Share': lambda x: f"{x:.2f}%"
+                'Market_Share_Pct': lambda x: f"{x:.2f}%"
             }),
             use_container_width=True,
             height=500
         )
+
 # ==========================================
 # REPORT 11: PRODUCT TRENDS
 # ==========================================
@@ -2728,8 +2729,6 @@ elif report == "📋 Raw Data Explorer":
     
     # Show the data table
     st.dataframe(filtered, use_container_width=True, height=600)
-    
-   
 
 # Global Footer
 st.sidebar.markdown("---")
