@@ -3,7 +3,7 @@
 # Google Sheets Configuration
 SHEET_ID = "169hKphPMANY80czkxcAZvqtvQMqfagC_jVnEuOZqhwk"  # Replace with your actual Sheet ID
 SHEET_NAME = "Order Confirmation"  # Your sub-sheet name
-CREDENTIALS_FILE = "needy-data/service_account.json"
+CREDENTIALS_FILE = "service_account.json"
 
 # Brush/Sweeper/Broomer Data Sheet
 BRUSH_SHEET_NAME = "Brommer Brush Data"  # Target sheet for brush data
