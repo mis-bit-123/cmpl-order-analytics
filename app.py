@@ -21,17 +21,126 @@ st.set_page_config(
 # ==========================================
 st.markdown("""
 <style>
+/* Main Header - Crystal Clear & Blur-Free */
+.main-header { 
+    font-size: 2.8rem; 
+    font-weight: 800; 
+    color: #ffffff;
+    background: transparent;
+    text-align: center;
+    padding: 25px 20px;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 1;
+}
 
-    /* Main Header */
-    .main-header { 
-        font-size: 2.8rem; 
-        font-weight: 800; 
-        background: linear-gradient(90deg, #1f77b4, #ff7f0e);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        padding-bottom: 10px;
-        border-bottom: 3px solid #1f77b4;
+/* Container with gradient background - NO BLUR */
+.main-header-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 5px;
+    margin-bottom: 30px;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Inner container for clean edges */
+.main-header-inner {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Alternative: Solid background approach (NO blur effects) */
+.main-header-solid {
+    font-size: 2.8rem; 
+    font-weight: 800; 
+    color: #ffffff;
+    text-align: center;
+    padding: 30px;
+    margin-bottom: 25px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border: none;
+}
+
+/* Simple and clean - NO blur, NO gradient text */
+.main-header-clean {
+    font-size: 2.8rem; 
+    font-weight: 800; 
+    color: #667eea;
+    text-align: center;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    border-bottom: 4px solid #667eea;
+    text-shadow: none;
+    background: none;
+    -webkit-text-fill-color: #667eea;
+}
+
+/* Dark mode optimized */
+@media (prefers-color-scheme: dark) {
+    .main-header-clean {
+        color: #a8b9f0;
+        border-bottom-color: #a8b9f0;
+        -webkit-text-fill-color: #a8b9f0;
     }
+}
+
+/* Light mode optimized */
+@media (prefers-color-scheme: light) {
+    .main-header-clean {
+        color: #4c63d2;
+        border-bottom-color: #4c63d2;
+        -webkit-text-fill-color: #4c63d2;
+    }
+}
+
+/* RECOMMENDED: Glass effect without blur issues */
+.main-header-glass {
+    font-size: 2.8rem; 
+    font-weight: 800; 
+    color: #ffffff;
+    text-align: center;
+    padding: 30px;
+    margin-bottom: 25px;
+    background: rgba(102, 126, 234, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* With accent line */
+.main-header-accent {
+    font-size: 2.8rem; 
+    font-weight: 800; 
+    color: #f8fafc;
+    text-align: center;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.main-header-accent::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+}
 
     .subheader { 
         font-size: 1.5rem; 
@@ -164,7 +273,7 @@ st.sidebar.markdown(f"""
 
 report_categories = {
     "📊 Overview": ["🏠 Executive Dashboard", "📈 Performance Metrics"],
-    "🗺️ Geographic": ["🗺️ State-wise Deep Dive", "🗺️ State vs Product Matrix", "🗺️ Regional Comparison"],
+    "🗺️ Geographic": ["🗺️ State-wise Deep Dive", "🗺️ State vs Product Matrix", "🗺️ Regional Comparison", "🗺️ Map Analytics"],
     "💰 Financial": ["💰 Revenue Trends", "💰 Year-wise Analysis", "💰 Monthly Insights", "💰 Top Revenue Sources"],
     "🔧 Products": ["🔧 Product Performance", "🔧 Product Trends", "🔧 Best Sellers by State"],
     "🏢 Companies": ["🏢 Company Analysis", "🏢 Customer Segmentation"],
@@ -557,104 +666,705 @@ elif report == "🏠 Executive Dashboard":
         st.plotly_chart(fig, use_container_width=True)
 
 # ==========================================
-# REPORT 2: PERFORMANCE METRICS
+# REPORT 2: PERFORMANCE METRICS (PROFESSIONAL EDITION)
 # ==========================================
 elif report == "📈 Performance Metrics":
-    st.markdown("## 📈 Advanced Performance Metrics")
     
-    col1, col2 = st.columns(2)
+    # Premium Styling
+    st.markdown("""
+        <style>
+        .metric-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            margin-bottom: 30px;
+        }
+        .metric-card-pro {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        .metric-card-pro:hover {
+            transform: translateY(-5px);
+        }
+        .trend-up { color: #10b981; font-weight: 600; }
+        .trend-down { color: #ef4444; font-weight: 600; }
+        .insight-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 5px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
     
-    with col1:
-        st.markdown("### 📊 Order Statistics")
-        stats_df = pd.DataFrame({
-            'Metric': ['Total Orders', 'Total Revenue', 'Avg Order Value', 'Total Quantity', 'Unique States', 'Unique Products'],
-            'Value': [
-                len(df),
-                f"{CURRENCY}{df['Total_Amount'].sum():,.0f}",
-                f"{CURRENCY}{df['Total_Amount'].mean():,.0f}",
-                f"{df['Qty'].sum():,.0f}",
-                df['State'].nunique(),
-                df['Product'].nunique()
-            ]
-        })
-        st.table(stats_df)
+    # Header
+    st.markdown('<div class="metric-hero">', unsafe_allow_html=True)
+    st.markdown("## 📈 Performance Analytics Center")
+    st.markdown("### Real-time Business Intelligence & KPI Monitoring")
+    st.markdown('</div>', unsafe_allow_html=True)
     
-    with col2:
-        st.markdown("### 📈 Growth Metrics")
-        if len(df) > 0:
-            daily_orders = df.groupby('Date').size()
-            growth_rate = ((daily_orders.iloc[-1] - daily_orders.iloc[0]) / daily_orders.iloc[0] * 100) if len(daily_orders) > 1 else 0
-            
-            metrics = {
-                "Avg Orders/Day": f"{daily_orders.mean():.1f}",
-                "Peak Day Orders": f"{daily_orders.max()}",
-                "Revenue/Day": f"{CURRENCY}{df.groupby('Date')['Total_Amount'].sum().mean():,.0f}",
-                "Growth Rate": f"{growth_rate:.1f}%"
-            }
-            for k, v in metrics.items():
-                st.metric(k, v)
-
+    # Ensure datetime
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    df['Month'] = df['Date'].dt.month
+    df['Quarter'] = df['Date'].dt.quarter
+    df['Week'] = df['Date'].dt.isocalendar().week
+    df['DayOfWeek'] = df['Date'].dt.day_name()
+    df['YearMonth'] = df['Date'].dt.to_period('M')
+    
+    available_years = sorted(df['Year'].unique())
+    
+    # Control Panel
+    st.markdown("### 🎛️ Analysis Controls")
+    col_ctrl1, col_ctrl2, col_ctrl3, col_ctrl4 = st.columns([1, 1, 1, 1])
+    
+    with col_ctrl1:
+        year_filter = st.selectbox("📅 Period:", ["All Years"] + [str(y) for y in available_years])
+    
+    with col_ctrl2:
+        comparison_mode = st.selectbox("📊 Comparison:", ["None", "Previous Period", "Year-over-Year"])
+    
+    with col_ctrl3:
+        metric_focus = st.selectbox("🎯 Focus:", ["Revenue", "Orders", "Quantity", "Efficiency"])
+    
+    with col_ctrl4:
+        granularity = st.selectbox("⏱️ Granularity:", ["Daily", "Weekly", "Monthly", "Quarterly"])
+    
+    # Filter data
+    if year_filter != "All Years":
+        analysis_df = df[df['Year'] == int(year_filter)].copy()
+        period_label = f"FY {year_filter}"
+    else:
+        analysis_df = df.copy()
+        period_label = "All Time"
+    
+    # Core Calculations
+    total_revenue = analysis_df['Total_Amount'].sum()
+    total_orders = analysis_df['Inquiry_No'].nunique()
+    total_quantity = analysis_df['Qty'].sum()
+    total_transactions = len(analysis_df)
+    unique_states = analysis_df['State'].nunique()
+    unique_products = analysis_df['Product'].nunique()
+    unique_customers = analysis_df['Company'].nunique()
+    
+    avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+    avg_qty_per_order = total_quantity / total_orders if total_orders > 0 else 0
+    revenue_per_state = total_revenue / unique_states if unique_states > 0 else 0
+    revenue_per_product = total_revenue / unique_products if unique_products > 0 else 0
+    
+    # Time-based metrics
+    date_range = (analysis_df['Date'].max() - analysis_df['Date'].min()).days + 1
+    revenue_per_day = total_revenue / date_range if date_range > 0 else 0
+    orders_per_day = total_orders / date_range if date_range > 0 else 0
+    
+    # ==================== HERO METRICS SECTION ====================
+    st.markdown("### 🎯 Key Performance Indicators")
+    
+    # Determine metric colors based on focus
+    if metric_focus == "Revenue":
+        primary_color = "#667eea"
+        secondary_color = "#764ba2"
+    elif metric_focus == "Orders":
+        primary_color = "#f093fb"
+        secondary_color = "#f5576c"
+    elif metric_focus == "Quantity":
+        primary_color = "#4facfe"
+        secondary_color = "#00f2fe"
+    else:
+        primary_color = "#43e97b"
+        secondary_color = "#38f9d7"
+    
+    col_kpi1, col_kpi2, col_kpi3, col_kpi4, col_kpi5, col_kpi6 = st.columns(6)
+    
+    with col_kpi1:
+        st.markdown(f"""
+            <div class="metric-card-pro" style="border-left-color: {primary_color};">
+                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">TOTAL REVENUE</p>
+                <h2 style="color: {primary_color}; margin: 10px 0; font-size: 1.8rem;">{CURRENCY}{total_revenue/1e6:.2f}M</h2>
+                <p style="font-size: 0.8rem; color: #6b7280;">{period_label}</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with col_kpi2:
+        st.markdown(f"""
+            <div class="metric-card-pro" style="border-left-color: {secondary_color};">
+                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">TOTAL ORDERS</p>
+                <h2 style="color: {secondary_color}; margin: 10px 0; font-size: 1.8rem;">{total_orders:,}</h2>
+                <p style="font-size: 0.8rem; color: #6b7280;">{total_transactions:,} transactions</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with col_kpi3:
+        st.markdown(f"""
+            <div class="metric-card-pro" style="border-left-color: #10b981;">
+                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">AVG ORDER VALUE</p>
+                <h2 style="color: #10b981; margin: 10px 0; font-size: 1.8rem;">{CURRENCY}{avg_order_value:,.0f}</h2>
+                <p style="font-size: 0.8rem; color: #6b7280;">Per transaction</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with col_kpi4:
+        st.markdown(f"""
+            <div class="metric-card-pro" style="border-left-color: #f59e0b;">
+                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">TOTAL QUANTITY</p>
+                <h2 style="color: #f59e0b; margin: 10px 0; font-size: 1.8rem;">{total_quantity/1e3:.1f}K</h2>
+                <p style="font-size: 0.8rem; color: #6b7280;">Units sold</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with col_kpi5:
+        st.markdown(f"""
+            <div class="metric-card-pro" style="border-left-color: #ef4444;">
+                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">ACTIVE MARKETS</p>
+                <h2 style="color: #ef4444; margin: 10px 0; font-size: 1.8rem;">{unique_states}</h2>
+                <p style="font-size: 0.8rem; color: #6b7280;">{unique_products} products</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with col_kpi6:
+        st.markdown(f"""
+            <div class="metric-card-pro" style="border-left-color: #8b5cf6;">
+                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">CUSTOMER BASE</p>
+                <h2 style="color: #8b5cf6; margin: 10px 0; font-size: 1.8rem;">{unique_customers:,}</h2>
+                <p style="font-size: 0.8rem; color: #6b7280;">Unique companies</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    
 # ==========================================
-# REPORT 3: STATE-WISE DEEP DIVE
+# REPORT 3: STATE-WISE DEEP DIVE (ENHANCED & FIXED)
 # ==========================================
 elif report == "🗺️ State-wise Deep Dive":
     st.markdown("## 🗺️ Comprehensive State Analysis")
+    st.markdown("---")
     
-    # State selector with multi-select
-    states = sorted(df['State'].unique())
-    selected_states = st.multiselect("🗺️ Select States to Compare:", states, default=states[:5])
+    # Ensure Date column is datetime
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
     
-    if not selected_states:
-        st.warning("Please select at least one state")
+    # Extract Year for filtering
+    df['Year'] = df['Date'].dt.year
+    
+    # Validate available years
+    available_years = sorted(df['Year'].unique())
+    target_years = [2024, 2025, 2026]
+    valid_years = [year for year in target_years if year in available_years]
+    
+    if not valid_years:
+        st.error("No data available for years 2024-2026. Please check your data.")
         st.stop()
     
-    filtered = df[df['State'].isin(selected_states)]
+    # Year Selector - Horizontal layout
+    col_year, col_metric = st.columns([1, 2])
+    with col_year:
+        selected_years = st.multiselect(
+            "📅 Select Years:", 
+            valid_years, 
+            default=valid_years,
+            help="Compare performance across multiple years"
+        )
     
-    # Tabs for different views
-    tab1, tab2, tab3 = st.tabs(["📊 Overview", "📈 Trends", "🔍 Product Breakdown"])
+    if not selected_years:
+        st.warning("⚠️ Please select at least one year")
+        st.stop()
+    
+    # Filter data by selected years
+    year_filtered_df = df[df['Year'].isin(selected_years)]
+    
+    with col_metric:
+        comparison_metric = st.radio(
+            "📊 Comparison Metric:",
+            ["Revenue (Total_Amount)", "Quantity (Qty)", "Orders (Count)"],
+            horizontal=True,
+            help="Choose metric for state comparisons"
+        )
+    
+    # State selector with search and multi-select
+    states = sorted(year_filtered_df['State'].unique())
+    
+    col_state, col_view = st.columns([2, 1])
+    with col_state:
+        selected_states = st.multiselect(
+            "🗺️ Select States to Compare:", 
+            states, 
+            default=states[:min(5, len(states))],
+            help="Select multiple states for comparative analysis"
+        )
+    
+    if not selected_states:
+        st.warning("⚠️ Please select at least one state")
+        st.stop()
+    
+    with col_view:
+        view_type = st.selectbox(
+            "👁️ View Mode:",
+            ["Combined View", "Year-over-Year", "Side-by-Side"],
+            help="Choose how to visualize multi-year data"
+        )
+    
+    # Filter data
+    filtered = year_filtered_df[year_filtered_df['State'].isin(selected_states)]
+    
+    # Create tabs for different analysis views
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📊 Overview & Rankings", 
+        "📈 Trends & Growth", 
+        "🎯 Product Breakdown", 
+        "🔥 Year-wise Heatmap"
+    ])
+    
+    # Metric mapping for dynamic calculations
+    metric_map = {
+        "Revenue (Total_Amount)": ("Total_Amount", "sum", CURRENCY),
+        "Quantity (Qty)": ("Qty", "sum", ""),
+        "Orders (Count)": ("Inquiry_No", "count", "")
+    }
+    
+    metric_col, agg_func, currency_symbol = metric_map[comparison_metric]
     
     with tab1:
-        col1, col2 = st.columns([2, 1])
-        with col1:
+        st.markdown("### 📊 State Performance Overview")
+        
+        if view_type == "Combined View":
+            # Aggregate across all selected years
             state_summary = filtered.groupby('State').agg({
                 'Total_Amount': 'sum',
                 'Qty': 'sum',
-                'Inquiry_No': 'count'
-            }).rename(columns={'Inquiry_No': 'Orders'}).reset_index()
+                'Inquiry_No': 'count',
+                'Year': 'nunique'
+            }).rename(columns={
+                'Inquiry_No': 'Orders', 
+                'Year': 'Active_Years'
+            }).reset_index()
             
-            fig = px.bar(state_summary, x='State', y=['Total_Amount', 'Qty'], 
-                        barmode='group', title='Revenue vs Quantity by State')
-            st.plotly_chart(fig, use_container_width=True)
+            # Calculate averages per year
+            state_summary['Avg_Revenue_Per_Year'] = state_summary['Total_Amount'] / state_summary['Active_Years']
+            
+            col_chart, col_table = st.columns([3, 2])
+            
+            with col_chart:
+                # Dual-axis bar chart
+                fig = go.Figure()
+                
+                # Determine which column to use based on metric
+                if metric_col == 'Inquiry_No':
+                    y_values = state_summary['Orders']
+                elif metric_col == 'Qty':
+                    y_values = state_summary['Qty']
+                else:
+                    y_values = state_summary['Total_Amount']
+                
+                # Primary metric bars
+                fig.add_trace(go.Bar(
+                    name=comparison_metric.split('(')[0].strip(),
+                    x=state_summary['State'],
+                    y=y_values,
+                    marker_color='royalblue',
+                    opacity=0.8
+                ))
+                
+                # Secondary metric line (Revenue always shown as reference)
+                if metric_col != 'Total_Amount':
+                    fig.add_trace(go.Scatter(
+                        name='Revenue Trend',
+                        x=state_summary['State'],
+                        y=state_summary['Total_Amount'],
+                        mode='lines+markers',
+                        yaxis='y2',
+                        line=dict(color='firebrick', width=3),
+                        marker=dict(size=8)
+                    ))
+                
+                fig.update_layout(
+                    title=f'State Comparison: {comparison_metric}',
+                    xaxis_title="State",
+                    yaxis_title=comparison_metric,
+                    yaxis2=dict(
+                        title="Revenue",
+                        overlaying='y',
+                        side='right',
+                        showgrid=False
+                    ),
+                    barmode='group',
+                    height=500,
+                    template='plotly_white',
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02)
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col_table:
+                st.markdown("### 🏆 State Rankings")
+                
+                # Determine ranking column
+                if metric_col == 'Inquiry_No':
+                    rank_col = 'Orders'
+                elif metric_col == 'Qty':
+                    rank_col = 'Qty'
+                else:
+                    rank_col = 'Total_Amount'
+                
+                state_summary['Rank'] = state_summary[rank_col].rank(ascending=False)
+                
+                # Format display
+                display_df = state_summary.sort_values(rank_col, ascending=False)
+                
+                def highlight_top3(row):
+                    if row['Rank'] == 1:
+                        return ['background-color: gold'] * len(row)
+                    elif row['Rank'] == 2:
+                        return ['background-color: silver'] * len(row)
+                    elif row['Rank'] == 3:
+                        return ['background-color: #CD7F32'] * len(row)  # Bronze
+                    return [''] * len(row)
+                
+                st.dataframe(
+                    display_df.style.format({
+                        'Total_Amount': lambda x: f"{CURRENCY}{x:,.0f}",
+                        'Qty': lambda x: f"{x:,.0f}",
+                        'Orders': lambda x: f"{x:,.0f}",
+                        'Avg_Revenue_Per_Year': lambda x: f"{CURRENCY}{x:,.0f}"
+                    }).apply(highlight_top3, axis=1),
+                    use_container_width=True,
+                    height=400
+                )
         
-        with col2:
-            st.markdown("### 📋 State Rankings")
-            state_summary['Rank'] = state_summary['Total_Amount'].rank(ascending=False)
-            st.dataframe(state_summary.sort_values('Total_Amount', ascending=False).style.format({
-                'Total_Amount': lambda x: f"{CURRENCY}{x:,.0f}",
-                'Qty': lambda x: f"{x:,.0f}"
-            }), use_container_width=True)
+        elif view_type == "Year-over-Year":
+            # FIXED: Proper aggregation for year-over-year comparison
+            if metric_col == 'Inquiry_No':
+                # For count, use size() and reset index properly
+                yearly_state = filtered.groupby(['State', 'Year']).size().reset_index(name='Value')
+            else:
+                # For sum operations
+                yearly_state = filtered.groupby(['State', 'Year'])[metric_col].sum().reset_index(name='Value')
+            
+            # Create the line chart
+            fig = px.line(
+                yearly_state, 
+                x='Year', 
+                y='Value', 
+                color='State',
+                markers=True,
+                title=f'Year-over-Year {comparison_metric} Comparison',
+                template='plotly_white',
+                labels={'Value': comparison_metric.split('(')[0].strip()}
+            )
+            
+            # Ensure x-axis shows only selected years as integers
+            fig.update_layout(
+                height=500, 
+                xaxis=dict(
+                    tickmode='array', 
+                    tickvals=selected_years,
+                    dtick=1
+                )
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Growth rate calculation
+            if len(selected_years) > 1:
+                st.markdown("### 📈 Growth Analysis")
+                growth_data = []
+                
+                for state in selected_states:
+                    state_data = yearly_state[yearly_state['State'] == state].sort_values('Year')
+                    if len(state_data) > 1:
+                        first_val = state_data.iloc[0]['Value']
+                        last_val = state_data.iloc[-1]['Value']
+                        growth = ((last_val - first_val) / first_val * 100) if first_val != 0 else 0
+                        growth_data.append({
+                            'State': state,
+                            'First_Year': int(state_data.iloc[0]['Year']),
+                            'Last_Year': int(state_data.iloc[-1]['Year']),
+                            'First_Value': first_val,
+                            'Last_Value': last_val,
+                            'Growth_Rate': f"{growth:+.1f}%",
+                            'Trend': '📈' if growth > 0 else '📉' if growth < 0 else '➡️'
+                        })
+                
+                if growth_data:
+                    growth_df = pd.DataFrame(growth_data)
+                    st.dataframe(
+                        growth_df.style.format({
+                            'First_Value': lambda x: f"{x:,.0f}",
+                            'Last_Value': lambda x: f"{x:,.0f}"
+                        }),
+                        use_container_width=True
+                    )
+        
+        else:  # Side-by-Side
+            cols = st.columns(len(selected_years))
+            for idx, year in enumerate(selected_years):
+                with cols[idx]:
+                    st.markdown(f"### {year}")
+                    year_data = filtered[filtered['Year'] == year].groupby('State').agg({
+                        'Total_Amount': 'sum',
+                        'Qty': 'sum',
+                        'Inquiry_No': 'count'
+                    }).rename(columns={'Inquiry_No': 'Orders'})
+                    
+                    # Determine y-axis column
+                    if metric_col == 'Inquiry_No':
+                        y_col = 'Orders'
+                    elif metric_col == 'Qty':
+                        y_col = 'Qty'
+                    else:
+                        y_col = 'Total_Amount'
+                    
+                    fig = px.bar(
+                        year_data.reset_index(), 
+                        x='State', 
+                        y=y_col,
+                        color='State',
+                        title=f'{year} Performance',
+                        template='plotly_white',
+                        labels={y_col: comparison_metric.split('(')[0].strip()}
+                    )
+                    fig.update_layout(showlegend=False, height=300)
+                    st.plotly_chart(fig, use_container_width=True)
     
     with tab2:
-        st.markdown("### 📈 State-wise Monthly Trends")
-        for state in selected_states[:3]:  # Show top 3 to avoid clutter
-            state_df = df[df['State'] == state]
-            monthly = state_df.groupby(state_df['Date'].dt.to_period('M'))['Total_Amount'].sum()
-            monthly.index = monthly.index.to_timestamp()
-            st.line_chart(monthly, use_container_width=True)
-            st.caption(f"Trend for {state}")
+        st.markdown("### 📈 Temporal Trends Analysis")
+        
+        # Determine metric for top states calculation
+        if metric_col == 'Inquiry_No':
+            calc_col = 'Inquiry_No'
+            calc_agg = 'count'
+        else:
+            calc_col = metric_col
+            calc_agg = 'sum'
+        
+        # Get top 3 states based on selected metric
+        if calc_agg == 'count':
+            top_states = filtered.groupby('State')[calc_col].count().nlargest(3).index.tolist()
+        else:
+            top_states = filtered.groupby('State')[calc_col].sum().nlargest(3).index.tolist()
+        
+        col_trend, col_seasonal = st.columns([2, 1])
+        
+        with col_trend:
+            st.markdown("#### Monthly Trends (Top 3 States)")
+            
+            for state in top_states:
+                state_df = filtered[filtered['State'] == state]
+                
+                # Aggregate monthly data
+                if calc_agg == 'count':
+                    monthly = state_df.groupby(state_df['Date'].dt.to_period('M')).size().reset_index(name='Value')
+                else:
+                    monthly = state_df.groupby(state_df['Date'].dt.to_period('M'))[calc_col].sum().reset_index(name='Value')
+                
+                monthly['Date'] = monthly['Date'].dt.to_timestamp()
+                
+                # Create filled area chart
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(
+                    x=monthly['Date'],
+                    y=monthly['Value'],
+                    fill='tozeroy',
+                    name=state,
+                    line=dict(width=2),
+                    mode='lines'
+                ))
+                
+                fig.update_layout(
+                    title=f"{state} - Monthly {comparison_metric}",
+                    height=250,
+                    template='plotly_white',
+                    showlegend=False,
+                    margin=dict(l=20, r=20, t=40, b=20),
+                    xaxis_title="Month",
+                    yaxis_title=comparison_metric.split('(')[0].strip()
+                )
+                st.plotly_chart(fig, use_container_width=True)
+        
+        with col_seasonal:
+            st.markdown("#### 🎯 Quick Insights")
+            
+            # Calculate metrics for insights
+            total_revenue = filtered['Total_Amount'].sum()
+            total_orders = filtered['Inquiry_No'].nunique()
+            avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+            
+            st.metric("Total Revenue (Selected)", f"{CURRENCY}{total_revenue:,.0f}")
+            st.metric("Total Orders", f"{total_orders:,}")
+            st.metric("Avg Order Value", f"{CURRENCY}{avg_order_value:,.0f}")
+            
+            # Best performing state
+            best_state = filtered.groupby('State')['Total_Amount'].sum().idxmax()
+            best_revenue = filtered.groupby('State')['Total_Amount'].sum().max()
+            st.success(f"🏆 Top State: **{best_state}**  \nRevenue: {CURRENCY}{best_revenue:,.0f}")
     
     with tab3:
-        selected_state_detail = st.selectbox("🔍 Select State for Product Details:", selected_states)
+        st.markdown("### 🎯 Product Distribution Analysis")
+        
+        col_prod1, col_prod2 = st.columns([1, 2])
+        
+        with col_prod1:
+            selected_state_detail = st.selectbox(
+                "🔍 Select State for Deep Dive:", 
+                selected_states,
+                help="Choose one state to analyze product performance"
+            )
+            
+            analysis_type = st.radio(
+                "Chart Type:",
+                ["Sunburst", "Treemap", "Bar Chart"],
+                help="Choose visualization type for product hierarchy"
+            )
+        
         if selected_state_detail:
-            state_products = df[df['State'] == selected_state_detail].groupby('Product').agg({
+            state_products = filtered[filtered['State'] == selected_state_detail].groupby(['Product', 'Year']).agg({
                 'Total_Amount': 'sum',
                 'Qty': 'sum',
                 'Inquiry_No': 'count'
+            }).reset_index()
+            
+            with col_prod2:
+                if analysis_type == "Sunburst":
+                    # Sunburst chart with Year and Product hierarchy
+                    fig = px.sunburst(
+                        state_products,
+                        path=['Year', 'Product'],
+                        values='Total_Amount',
+                        color='Total_Amount',
+                        color_continuous_scale='RdYlBu',
+                        title=f'Product Hierarchy in {selected_state_detail} (by Revenue)',
+                        template='plotly_white'
+                    )
+                    fig.update_layout(height=600)
+                    
+                elif analysis_type == "Treemap":
+                    fig = px.treemap(
+                        state_products,
+                        path=[px.Constant(selected_state_detail), 'Year', 'Product'],
+                        values='Total_Amount',
+                        color='Qty',
+                        color_continuous_scale='Viridis',
+                        title=f'Product Distribution in {selected_state_detail}',
+                        template='plotly_white'
+                    )
+                    fig.update_traces(root_color="lightgrey")
+                    fig.update_layout(height=600)
+                    
+                else:  # Bar Chart
+                    top_products = state_products.groupby('Product')['Total_Amount'].sum().nlargest(15).reset_index()
+                    fig = px.bar(
+                        top_products,
+                        x='Total_Amount',
+                        y='Product',
+                        orientation='h',
+                        color='Total_Amount',
+                        color_continuous_scale='Blues',
+                        title=f'Top 15 Products in {selected_state_detail}',
+                        template='plotly_white',
+                        labels={'Total_Amount': f'Revenue ({CURRENCY})'}
+                    )
+                    fig.update_layout(height=600, yaxis=dict(autorange="reversed"))
+                
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # Product performance table
+            st.markdown("#### 📋 Detailed Product Performance")
+            product_summary = filtered[filtered['State'] == selected_state_detail].groupby('Product').agg({
+                'Total_Amount': 'sum',
+                'Qty': 'sum',
+                'Inquiry_No': 'count',
+                'Year': lambda x: ', '.join(map(str, sorted(x.unique())))
+            }).rename(columns={
+                'Inquiry_No': 'Orders',
+                'Year': 'Active_Years'
             }).sort_values('Total_Amount', ascending=False).head(15)
             
-            fig = px.treemap(state_products.reset_index(), path=['Product'], values='Total_Amount',
-                           title=f'Product Distribution in {selected_state_detail}')
-            st.plotly_chart(fig, use_container_width=True)
+            st.dataframe(
+                product_summary.style.format({
+                    'Total_Amount': lambda x: f"{CURRENCY}{x:,.0f}",
+                    'Qty': lambda x: f"{x:,.0f}",
+                    'Orders': lambda x: f"{x:,.0f}"
+                }),
+                use_container_width=True
+            )
+    
+    with tab4:
+        st.markdown("### 🔥 Year-wise Performance Heatmap")
+        
+        # Create pivot table for heatmap
+        heatmap_data = filtered.groupby(['State', 'Year'])['Total_Amount'].sum().reset_index()
+        heatmap_pivot = heatmap_data.pivot(index='State', columns='Year', values='Total_Amount').fillna(0)
+        
+        # Ensure all selected years are present
+        for year in selected_years:
+            if year not in heatmap_pivot.columns:
+                heatmap_pivot[year] = 0
+        
+        # Sort columns to ensure chronological order
+        heatmap_pivot = heatmap_pivot[sorted(selected_years)]
+        
+        fig = px.imshow(
+            heatmap_pivot,
+            labels=dict(x="Year", y="State", color="Revenue"),
+            x=[str(year) for year in sorted(selected_years)],
+            y=heatmap_pivot.index,
+            color_continuous_scale="YlOrRd",
+            aspect="auto",
+            title="Revenue Heatmap: States vs Years",
+            template='plotly_white'
+        )
+        
+        # Add text annotations
+        fig.update_traces(
+            text=[[f"{CURRENCY}{val:,.0f}" for val in row] for row in heatmap_pivot.values],
+            texttemplate="%{text}",
+            textfont={"size": 10}
+        )
+        
+        fig.update_layout(height=max(400, len(selected_states) * 40))
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Year-over-Year growth heatmap
+        if len(selected_years) > 1:
+            st.markdown("### 📊 Year-over-Year Growth Rates (%)")
+            
+            # Calculate percentage change
+            growth_pivot = heatmap_pivot.pct_change(axis=1) * 100
+            growth_pivot = growth_pivot.iloc[:, 1:]  # Remove first year (NaN)
+            
+            if not growth_pivot.empty and not growth_pivot.isna().all().all():
+                fig_growth = px.imshow(
+                    growth_pivot,
+                    labels=dict(x="Year", y="State", color="Growth %"),
+                    color_continuous_scale="RdYlGn",
+                    color_continuous_midpoint=0,
+                    aspect="auto",
+                    title="YoY Growth Rate Heatmap (%)",
+                    template='plotly_white'
+                )
+                
+                # Add percentage text
+                fig_growth.update_traces(
+                    text=[[f"{val:.1f}%" if not pd.isna(val) else "N/A" for val in row] for row in growth_pivot.values],
+                    texttemplate="%{text}",
+                    textfont={"size": 10}
+                )
+                
+                fig_growth.update_layout(height=max(400, len(selected_states) * 40))
+                st.plotly_chart(fig_growth, use_container_width=True)
+            else:
+                st.info("Insufficient data for growth calculation")
 
 # ==========================================
 # REPORT 4: STATE VS PRODUCT MATRIX
@@ -684,44 +1394,1039 @@ elif report == "🗺️ State vs Product Matrix":
     st.dataframe(top_combos, use_container_width=True)
 
 # ==========================================
-# REPORT 5: REGIONAL COMPARISON (FIXED COLORS)
+# REPORT 5: REGIONAL COMPARISON (ENHANCED)
 # ==========================================
 elif report == "🗺️ Regional Comparison":
     st.markdown("## 🗺️ Multi-State Comparison Tool")
+    st.markdown("---")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        state1 = st.selectbox("🗺️ Select State 1:", df['State'].unique(), index=0)
-    with col2:
-        state2 = st.selectbox("🗺️ Select State 2:", df['State'].unique(), index=1 if len(df['State'].unique()) > 1 else 0)
+    # Ensure Date column is datetime and extract Year
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
     
-    # Comparison logic
-    s1_data = df[df['State'] == state1]
-    s2_data = df[df['State'] == state2]
+    # Get available years
+    available_years = sorted(df['Year'].unique())
+    
+    # Year Selection with "All Years" option
+    col_year, col_metric = st.columns([1, 2])
+    with col_year:
+        year_option = st.selectbox(
+            "📅 Select Year:",
+            ["All Years"] + [str(y) for y in available_years],
+            help="Compare states across specific year or all time"
+        )
+    
+    # Filter data based on year selection
+    if year_option == "All Years":
+        filtered_df = df.copy()
+        selected_year_label = "All Years"
+    else:
+        selected_year = int(year_option)
+        filtered_df = df[df['Year'] == selected_year]
+        selected_year_label = str(selected_year)
+    
+    with col_metric:
+        comparison_metric = st.radio(
+            "📊 Comparison Metric:",
+            ["Revenue (Total_Amount)", "Quantity (Qty)", "Orders (Count)"],
+            horizontal=True,
+            key="regional_metric"
+        )
+    
+    # State Selection with swap button
+    st.markdown("### 🗺️ Select States to Compare")
+    
+    col_s1, col_swap, col_s2 = st.columns([2, 0.5, 2])
+    
+    states_list = sorted(filtered_df['State'].unique())
+    
+    with col_s1:
+        state1 = st.selectbox(
+            "State 1:", 
+            states_list, 
+            index=0,
+            key="state1_select"
+        )
+    
+    with col_swap:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🔄", help="Swap States"):
+            # Store in session state to swap
+            if 'state1_select' in st.session_state and 'state2_select' in st.session_state:
+                st.session_state.state1_select, st.session_state.state2_select = \
+                    st.session_state.state2_select, st.session_state.state1_select
+                st.rerun()
+    
+    with col_s2:
+        # Filter out state1 from options for state2 to prevent same state comparison
+        state2_options = [s for s in states_list if s != state1]
+        default_index = 0 if len(state2_options) > 0 else 0
+        state2 = st.selectbox(
+            "State 2:", 
+            state2_options, 
+            index=default_index,
+            key="state2_select"
+        )
+    
+    # Get data for both states
+    s1_data = filtered_df[filtered_df['State'] == state1]
+    s2_data = filtered_df[filtered_df['State'] == state2]
+    
+    # Metric calculations
+    metric_map = {
+        "Revenue (Total_Amount)": ("Total_Amount", "sum"),
+        "Quantity (Qty)": ("Qty", "sum"),
+        "Orders (Count)": ("Inquiry_No", "count")
+    }
+    metric_col, agg_func = metric_map[comparison_metric]
+    
+    # Calculate metrics
+    def calculate_metrics(data):
+        if data.empty:
+            return {
+                'revenue': 0,
+                'orders': 0,
+                'quantity': 0,
+                'avg_order': 0,
+                'top_product': "N/A",
+                'top_product_revenue': 0,
+                'unique_products': 0,
+                'active_months': 0
+            }
+        
+        metrics = {
+            'revenue': data['Total_Amount'].sum(),
+            'orders': data['Inquiry_No'].nunique(),
+            'quantity': data['Qty'].sum(),
+            'avg_order': data['Total_Amount'].mean(),
+            'unique_products': data['Product'].nunique(),
+            'active_months': data['Date'].dt.to_period('M').nunique()
+        }
+        
+        # Top product
+        top_prod = data.groupby('Product')['Total_Amount'].sum()
+        metrics['top_product'] = top_prod.idxmax() if not top_prod.empty else "N/A"
+        metrics['top_product_revenue'] = top_prod.max() if not top_prod.empty else 0
+        
+        return metrics
+    
+    s1_metrics = calculate_metrics(s1_data)
+    s2_metrics = calculate_metrics(s2_data)
+    
+    # Display Metrics Cards with Delta Comparison
+    st.markdown(f"### 📊 Performance Overview - {selected_year_label}")
     
     cols = st.columns(2)
-    for idx, (state, data) in enumerate([(state1, s1_data), (state2, s2_data)]):
+    
+    # Color scheme - Professional contrasting colors
+    colors = {
+        'state1': '#2563EB',  # Royal Blue
+        'state2': '#DC2626',  # Red
+        'state1_light': '#DBEAFE',
+        'state2_light': '#FEE2E2'
+    }
+    
+    for idx, (state, data, metrics) in enumerate([
+        (state1, s1_data, s1_metrics), 
+        (state2, s2_data, s2_metrics)
+    ]):
         with cols[idx]:
-            st.markdown(f"### 🏳️ {state}")
-            st.metric("Revenue", f"{CURRENCY}{data['Total_Amount'].sum():,.0f}")
-            st.metric("Orders", f"{len(data)}")
-            st.metric("Avg Order", f"{CURRENCY}{data['Total_Amount'].mean():,.0f}")
-            st.metric("Top Product", data.groupby('Product')['Total_Amount'].sum().idxmax() if not data.empty else "N/A")
+            # Header with color indicator
+            header_color = colors['state1'] if idx == 0 else colors['state2']
+            st.markdown(
+                f"<h3 style='color: {header_color}; border-bottom: 3px solid {header_color}; padding-bottom: 10px;'>"
+                f"🏴 {state}</h3>", 
+                unsafe_allow_html=True
+            )
+            
+            # Main metrics in styled containers
+            with st.container():
+                col_m1, col_m2 = st.columns(2)
+                
+                with col_m1:
+                    # Primary metric based on selection
+                    if metric_col == 'Total_Amount':
+                        st.metric(
+                            "Total Revenue", 
+                            f"{CURRENCY}{metrics['revenue']:,.0f}",
+                            delta=None
+                        )
+                    elif metric_col == 'Qty':
+                        st.metric(
+                            "Total Quantity", 
+                            f"{metrics['quantity']:,.0f}",
+                            delta=None
+                        )
+                    else:
+                        st.metric(
+                            "Total Orders", 
+                            f"{metrics['orders']:,}",
+                            delta=None
+                        )
+                
+                with col_m2:
+                    st.metric(
+                        "Avg Order Value", 
+                        f"{CURRENCY}{metrics['avg_order']:,.0f}",
+                        delta=None
+                    )
+                
+                col_m3, col_m4 = st.columns(2)
+                with col_m3:
+                    st.metric("Unique Products", f"{metrics['unique_products']}")
+                with col_m4:
+                    st.metric("Active Months", f"{metrics['active_months']}")
+                
+                # Top product info
+                st.info(f"**Top Product:** {metrics['top_product']}  \n"
+                       f"Revenue: {CURRENCY}{metrics['top_product_revenue']:,.0f}")
     
-    # Comparison chart with OPPOSITE/CONTRASTING colors
-    comparison_df = pd.DataFrame({
-        state1: s1_data.groupby('Product')['Total_Amount'].sum(),
-        state2: s2_data.groupby('Product')['Total_Amount'].sum()
-    }).fillna(0)
+    # Winner Banner
+    st.markdown("---")
+    winner_col, diff_col = st.columns([1, 2])
     
-    fig = go.Figure()
-    # State 1 - Blue, State 2 - Orange/Red (Opposite colors)
-    fig.add_trace(go.Bar(name=state1, x=comparison_df.index, y=comparison_df[state1], 
-                        marker_color='#1f77b4'))  # Blue
-    fig.add_trace(go.Bar(name=state2, x=comparison_df.index, y=comparison_df[state2], 
-                        marker_color='#ff7f0e'))  # Orange (opposite of blue)
-    fig.update_layout(barmode='group', title='Product-wise Comparison', xaxis_tickangle=-45)
-    st.plotly_chart(fig, use_container_width=True)
+    with winner_col:
+        if metric_col == 'Total_Amount':
+            s1_score = s1_metrics['revenue']
+            s2_score = s2_metrics['revenue']
+        elif metric_col == 'Qty':
+            s1_score = s1_metrics['quantity']
+            s2_score = s2_metrics['quantity']
+        else:
+            s1_score = s1_metrics['orders']
+            s2_score = s2_metrics['orders']
+        
+        if s1_score > s2_score:
+            winner = state1
+            winner_color = colors['state1']
+            margin = ((s1_score - s2_score) / s2_score * 100) if s2_score > 0 else 0
+        elif s2_score > s1_score:
+            winner = state2
+            winner_color = colors['state2']
+            margin = ((s2_score - s1_score) / s1_score * 100) if s1_score > 0 else 0
+        else:
+            winner = "Tie"
+            winner_color = "#6B7280"
+            margin = 0
+        
+        if winner != "Tie":
+            st.markdown(
+                f"<div style='background-color: {winner_color}; color: white; padding: 15px; "
+                f"border-radius: 10px; text-align: center;'>"
+                f"<h2>🏆 Winner</h2>"
+                f"<h1>{winner}</h1>"
+                f"<p>Leading by {margin:.1f}%</p>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                f"<div style='background-color: {winner_color}; color: white; padding: 15px; "
+                f"border-radius: 10px; text-align: center;'>"
+                f"<h2>⚖️ Tie</h2>"
+                f"<p>Both states are equal</p>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+    
+    with diff_col:
+        # Comparison metrics table
+        comparison_metrics = pd.DataFrame({
+            'Metric': ['Revenue', 'Orders', 'Quantity', 'Avg Order Value', 'Unique Products'],
+            state1: [
+                f"{CURRENCY}{s1_metrics['revenue']:,.0f}",
+                f"{s1_metrics['orders']:,}",
+                f"{s1_metrics['quantity']:,.0f}",
+                f"{CURRENCY}{s1_metrics['avg_order']:,.0f}",
+                f"{s1_metrics['unique_products']}"
+            ],
+            state2: [
+                f"{CURRENCY}{s2_metrics['revenue']:,.0f}",
+                f"{s2_metrics['orders']:,}",
+                f"{s2_metrics['quantity']:,.0f}",
+                f"{CURRENCY}{s2_metrics['avg_order']:,.0f}",
+                f"{s2_metrics['unique_products']}"
+            ],
+            'Difference': [
+                f"{CURRENCY}{s1_metrics['revenue'] - s2_metrics['revenue']:+,.0f}",
+                f"{s1_metrics['orders'] - s2_metrics['orders']:+,.0f}",
+                f"{s1_metrics['quantity'] - s2_metrics['quantity']:+,.0f}",
+                f"{CURRENCY}{s1_metrics['avg_order'] - s2_metrics['avg_order']:+,.0f}",
+                f"{s1_metrics['unique_products'] - s2_metrics['unique_products']:+d}"
+            ]
+        })
+        
+        st.markdown("#### 📋 Detailed Comparison")
+        st.dataframe(comparison_metrics, use_container_width=True, hide_index=True)
+    
+    # Visualizations
+    st.markdown("---")
+    st.markdown("### 📈 Visual Analytics")
+    
+    tab1, tab2, tab3 = st.tabs(["Product Comparison", "Monthly Trends", "Category Breakdown"])
+    
+    with tab1:
+        # Product-wise comparison with selected metric
+        if metric_col == 'Inquiry_No':
+            s1_prod = s1_data.groupby('Product').size().reset_index(name='Value')
+            s2_prod = s2_data.groupby('Product').size().reset_index(name='Value')
+        else:
+            s1_prod = s1_data.groupby('Product')[metric_col].sum().reset_index(name='Value')
+            s2_prod = s2_data.groupby('Product')[metric_col].sum().reset_index(name='Value')
+        
+        # Merge for comparison
+        prod_comparison = pd.merge(
+            s1_prod.rename(columns={'Value': state1}),
+            s2_prod.rename(columns={'Value': state2}),
+            on='Product',
+            how='outer'
+        ).fillna(0)
+        
+        # Sort by total
+        prod_comparison['Total'] = prod_comparison[state1] + prod_comparison[state2]
+        prod_comparison = prod_comparison.sort_values('Total', ascending=False).head(15)
+        
+        # Chart type selector
+        chart_type = st.radio(
+            "Chart Type:",
+            ["Grouped Bar", "Stacked Bar", "Radar Chart"],
+            horizontal=True,
+            key="prod_chart_type"
+        )
+        
+        if chart_type == "Grouped Bar":
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                name=state1, 
+                x=prod_comparison['Product'], 
+                y=prod_comparison[state1],
+                marker_color=colors['state1'],
+                text=prod_comparison[state1].apply(lambda x: f'{x:,.0f}'),
+                textposition='auto'
+            ))
+            fig.add_trace(go.Bar(
+                name=state2, 
+                x=prod_comparison['Product'], 
+                y=prod_comparison[state2],
+                marker_color=colors['state2'],
+                text=prod_comparison[state2].apply(lambda x: f'{x:,.0f}'),
+                textposition='auto'
+            ))
+            fig.update_layout(
+                barmode='group',
+                title=f'Top Products Comparison ({comparison_metric.split("(")[0].strip()})',
+                xaxis_tickangle=-45,
+                height=500,
+                template='plotly_white',
+                legend=dict(orientation="h", yanchor="bottom", y=1.02)
+            )
+            
+        elif chart_type == "Stacked Bar":
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                name=state1, 
+                x=prod_comparison['Product'], 
+                y=prod_comparison[state1],
+                marker_color=colors['state1']
+            ))
+            fig.add_trace(go.Bar(
+                name=state2, 
+                x=prod_comparison['Product'], 
+                y=prod_comparison[state2],
+                marker_color=colors['state2']
+            ))
+            fig.update_layout(
+                barmode='stack',
+                title=f'Product Distribution - Stacked View',
+                xaxis_tickangle=-45,
+                height=500,
+                template='plotly_white'
+            )
+            
+        else:  # Radar Chart
+            fig = go.Figure()
+            fig.add_trace(go.Scatterpolar(
+                r=prod_comparison[state1].tolist() + [prod_comparison[state1].iloc[0]],
+                theta=prod_comparison['Product'].tolist() + [prod_comparison['Product'].iloc[0]],
+                fill='toself',
+                name=state1,
+                line_color=colors['state1']
+            ))
+            fig.add_trace(go.Scatterpolar(
+                r=prod_comparison[state2].tolist() + [prod_comparison[state2].iloc[0]],
+                theta=prod_comparison['Product'].tolist() + [prod_comparison['Product'].iloc[0]],
+                fill='toself',
+                name=state2,
+                line_color=colors['state2']
+            ))
+            fig.update_layout(
+                polar=dict(radialaxis=dict(visible=True)),
+                showlegend=True,
+                title="Product Performance Radar",
+                height=600,
+                template='plotly_white'
+            )
+        
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with tab2:
+        # Monthly trends comparison
+        col_monthly, col_stats = st.columns([3, 1])
+        
+        with col_monthly:
+            # Prepare monthly data
+            s1_monthly = s1_data.groupby(s1_data['Date'].dt.to_period('M')).agg({
+                'Total_Amount': 'sum',
+                'Qty': 'sum',
+                'Inquiry_No': 'count'
+            }).reset_index()
+            s1_monthly['Date'] = s1_monthly['Date'].dt.to_timestamp()
+            
+            s2_monthly = s2_data.groupby(s2_data['Date'].dt.to_period('M')).agg({
+                'Total_Amount': 'sum',
+                'Qty': 'sum',
+                'Inquiry_No': 'count'
+            }).reset_index()
+            s2_monthly['Date'] = s2_monthly['Date'].dt.to_timestamp()
+            
+            # Determine y-axis column
+            if metric_col == 'Inquiry_No':
+                y_col = 'Inquiry_No'
+                y_label = 'Orders'
+            elif metric_col == 'Qty':
+                y_col = 'Qty'
+                y_label = 'Quantity'
+            else:
+                y_col = 'Total_Amount'
+                y_label = 'Revenue'
+            
+            fig = go.Figure()
+            
+            # State 1 line
+            fig.add_trace(go.Scatter(
+                x=s1_monthly['Date'],
+                y=s1_monthly[y_col],
+                mode='lines+markers',
+                name=state1,
+                line=dict(color=colors['state1'], width=3),
+                marker=dict(size=8)
+            ))
+            
+            # State 2 line
+            fig.add_trace(go.Scatter(
+                x=s2_monthly['Date'],
+                y=s2_monthly[y_col],
+                mode='lines+markers',
+                name=state2,
+                line=dict(color=colors['state2'], width=3),
+                marker=dict(size=8)
+            ))
+            
+            fig.update_layout(
+                title=f'Monthly {y_label} Trends',
+                xaxis_title="Month",
+                yaxis_title=y_label,
+                height=450,
+                template='plotly_white',
+                hovermode='x unified'
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col_stats:
+            st.markdown("#### 📊 Trend Stats")
+            
+            # Calculate growth rates
+            if len(s1_monthly) > 1:
+                s1_growth = ((s1_monthly[y_col].iloc[-1] - s1_monthly[y_col].iloc[0]) / 
+                            s1_monthly[y_col].iloc[0] * 100)
+                st.metric(f"{state1} Growth", f"{s1_growth:+.1f}%")
+            
+            if len(s2_monthly) > 1:
+                s2_growth = ((s2_monthly[y_col].iloc[-1] - s2_monthly[y_col].iloc[0]) / 
+                            s2_monthly[y_col].iloc[0] * 100)
+                st.metric(f"{state2} Growth", f"{s2_growth:+.1f}%")
+            
+            # Peak months
+            if not s1_monthly.empty:
+                s1_peak = s1_monthly.loc[s1_monthly[y_col].idxmax()]
+                st.info(f"**{state1} Peak:**  \n"
+                       f"{s1_peak['Date'].strftime('%b %Y')}  \n"
+                       f"{CURRENCY if y_col == 'Total_Amount' else ''}{s1_peak[y_col]:,.0f}")
+            
+            if not s2_monthly.empty:
+                s2_peak = s2_monthly.loc[s2_monthly[y_col].idxmax()]
+                st.info(f"**{state2} Peak:**  \n"
+                       f"{s2_peak['Date'].strftime('%b %Y')}  \n"
+                       f"{CURRENCY if y_col == 'Total_Amount' else ''}{s2_peak[y_col]:,.0f}")
+    
+    with tab3:
+        # Product category analysis (if you have categories, otherwise use first letter grouping)
+        st.markdown("#### 🏷️ Product Category Analysis")
+        
+        # Create pseudo-categories from product names (first word)
+        s1_data_copy = s1_data.copy()
+        s2_data_copy = s2_data.copy()
+        
+        s1_data_copy['Category'] = s1_data_copy['Product'].str.split().str[0]
+        s2_data_copy['Category'] = s2_data_copy['Product'].str.split().str[0]
+        
+        if metric_col == 'Inquiry_No':
+            s1_cat = s1_data_copy.groupby('Category').size().reset_index(name='Value')
+            s2_cat = s2_data_copy.groupby('Category').size().reset_index(name='Value')
+        else:
+            s1_cat = s1_data_copy.groupby('Category')[metric_col].sum().reset_index(name='Value')
+            s2_cat = s2_data_copy.groupby('Category')[metric_col].sum().reset_index(name='Value')
+        
+        cat_comparison = pd.merge(
+            s1_cat.rename(columns={'Value': state1}),
+            s2_cat.rename(columns={'Value': state2}),
+            on='Category',
+            how='outer'
+        ).fillna(0)
+        
+        # Create sunburst chart
+        fig = go.Figure()
+        
+        # Donut charts side by side
+        from plotly.subplots import make_subplots
+        
+        fig = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]],
+                           subplot_titles=(state1, state2))
+        
+        fig.add_trace(go.Pie(
+            labels=cat_comparison['Category'],
+            values=cat_comparison[state1],
+            name=state1,
+            hole=0.4,
+            marker_colors=px.colors.sequential.Blues_r
+        ), row=1, col=1)
+        
+        fig.add_trace(go.Pie(
+            labels=cat_comparison['Category'],
+            values=cat_comparison[state2],
+            name=state2,
+            hole=0.4,
+            marker_colors=px.colors.sequential.Reds_r
+        ), row=1, col=2)
+        
+        fig.update_layout(
+            title_text="Category Distribution Comparison",
+            height=500,
+            template='plotly_white',
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=-0.2)
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Category comparison table
+        cat_comparison['Difference'] = cat_comparison[state1] - cat_comparison[state2]
+        cat_comparison = cat_comparison.sort_values('Difference', ascending=False)
+        
+        st.markdown("#### 📋 Category Breakdown")
+        st.dataframe(
+            cat_comparison.style.format({
+                state1: lambda x: f"{x:,.0f}",
+                state2: lambda x: f"{x:,.0f}",
+                'Difference': lambda x: f"{x:+,.0f}"
+            }).apply(lambda x: ['background-color: rgba(37, 99, 235, 0.1)' if x['Difference'] > 0 else 'background-color: rgba(220, 38, 38, 0.1)' if x['Difference'] < 0 else '' for _ in x], axis=1),
+            use_container_width=True,
+            hide_index=True
+        )
+
+
+        # 5.2  here new added the Map wise anlaysis for the states wise
+        # -----------------------------------------------------------------------------------------------------------------
+        #  =========================================================================================================
+          # ==========================================
+# ==========================================
+# REPORT: MAP ANALYTICS (GEOGRAPHIC INTELLIGENCE)
+# ==========================================
+# HOW TO ADD THIS TO YOUR app.py:
+# ─────────────────────────────────────────
+# 1. Find this line in your app.py (around the Regional Comparison section):
+#
+#       elif report == "🗺️ Map Analytics":
+#
+# 2. DELETE everything from that line down to (but NOT including) the next
+#    top-level elif, which starts:
+#
+#       elif report == "💰 Revenue Trends":
+#
+# 3. PASTE this entire file's contents in that gap.
+#    The indentation must be at the TOP LEVEL (no extra spaces before elif).
+# ─────────────────────────────────────────
+
+elif report == "🗺️ Map Analytics":
+
+    # ── Styling (same pattern as your other pages) ───────────────────────────
+    st.markdown("""
+        <style>
+        .map-header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 30px;
+            border-radius: 20px;
+            color: white;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(17,153,142,0.3);
+        }
+        .map-stats {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid #11998e;
+        }
+        .state-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            box-shadow: 0 8px 20px rgba(102,126,234,0.3);
+        }
+        </style>
+        <div class="map-header">
+            <h1 style="margin:0; font-size:2.5rem;">🗺️ Geographic Intelligence</h1>
+            <p style="margin:10px 0 0 0; font-size:1.1rem; opacity:0.9;">
+                State-wise Order Distribution & Market Analytics
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # ── Ensure datetime / Year column ────────────────────────────────────────
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+
+    available_years = sorted(df['Year'].unique())
+
+    # ── Controls ─────────────────────────────────────────────────────────────
+    st.markdown("### 🎛️ Map Controls")
+    col_ctrl1, col_ctrl2, col_ctrl3, col_ctrl4 = st.columns([1, 1, 1, 1])
+
+    with col_ctrl1:
+        year_select = st.selectbox(
+            "📅 Select Year:",
+            ["All Years"] + [str(y) for y in available_years],
+            help="Filter orders by year",
+            key="map_year_select"
+        )
+    with col_ctrl2:
+        metric_type = st.selectbox(
+            "📊 Metric:",
+            ["Revenue", "Order Count", "Quantity", "Average Order Value"],
+            help="Choose metric to visualise",
+            key="map_metric_type"
+        )
+    with col_ctrl3:
+        map_style = st.selectbox(
+            "🗺️ Map Style:",
+            ["Choropleth (India Map)", "Bubble Chart", "State Rankings Table"],
+            help="Visualisation style",
+            key="map_style"
+        )
+    with col_ctrl4:
+        top_n_states = st.slider(
+            "🏆 Top States:", 5, 30, 15,
+            help="Number of top states to highlight",
+            key="map_top_n"
+        )
+
+    # ── Filter ────────────────────────────────────────────────────────────────
+    if year_select != "All Years":
+        map_df = df[df['Year'] == int(year_select)].copy()
+        period_label = f"FY {year_select}"
+    else:
+        map_df = df.copy()
+        period_label = "All Time"
+
+    if map_df.empty:
+        st.error("⚠️ No data available for selected filters")
+        st.stop()
+
+    # ── Aggregate per state ───────────────────────────────────────────────────
+    metric_map = {
+        "Revenue":             ("Total_Amount", "sum"),
+        "Order Count":         ("Inquiry_No",   "nunique"),
+        "Quantity":            ("Qty",          "sum"),
+        "Average Order Value": ("Total_Amount", "mean"),
+    }
+    metric_col, agg_func = metric_map[metric_type]
+
+    if agg_func == "nunique":
+        state_metrics = map_df.groupby('State')[metric_col].nunique().reset_index()
+    elif agg_func == "mean":
+        state_metrics = map_df.groupby('State')[metric_col].mean().reset_index()
+    else:
+        state_metrics = map_df.groupby('State')[metric_col].sum().reset_index()
+    state_metrics.columns = ['State', 'Value']
+
+    # Extra detail columns
+    state_details = map_df.groupby('State').agg(
+        Revenue=('Total_Amount', 'sum'),
+        AvgOrder=('Total_Amount', 'mean'),
+        Transactions=('Total_Amount', 'count'),
+        TotalQty=('Qty', 'sum'),
+        Orders=('Inquiry_No', 'nunique'),
+        Customers=('Company', 'nunique'),
+        Products=('Product', 'nunique'),
+    ).round(2).reset_index()
+
+    state_metrics = state_metrics.merge(state_details, on='State', how='left')
+    state_metrics = state_metrics.sort_values('Value', ascending=False).reset_index(drop=True)
+
+    total_value = state_metrics['Value'].sum()
+    state_metrics['Percentage'] = (state_metrics['Value'] / total_value * 100).round(2)
+    state_metrics['CumulativePct'] = state_metrics['Percentage'].cumsum().round(2)
+
+    # ── India GeoJSON (cached) ────────────────────────────────────────────────
+    @st.cache_data(ttl=86400, show_spinner=False)
+    def _load_india_geojson():
+        """Load India state boundaries from GitHub mirror."""
+        try:
+            import requests as _req
+            url = (
+                "https://raw.githubusercontent.com/geohacker/india/"
+                "master/state/india_telengana.geojson"
+            )
+            r = _req.get(url, timeout=12)
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            return None
+
+    # ── MAP VISUALISATION ─────────────────────────────────────────────────────
+    plot_data = state_metrics.head(top_n_states).copy()
+
+    if map_style == "Choropleth (India Map)":
+        st.markdown(f"### 🗺️ India Heat Map — {metric_type} ({period_label})")
+
+        geojson = _load_india_geojson()
+
+        if geojson is not None:
+            # ── Find the property key that holds the state name ───────────────
+            name_key = "NAME_1"   # default for geohacker dataset
+            if geojson.get("features"):
+                props = geojson["features"][0].get("properties", {})
+                for k in ("NAME_1", "ST_NM", "name", "NAME"):
+                    if k in props:
+                        name_key = k
+                        break
+
+            fig_map = px.choropleth(
+                plot_data,
+                geojson=geojson,
+                locations="State",
+                featureidkey=f"properties.{name_key}",
+                color="Value",
+                hover_name="State",
+                hover_data={
+                    "State":      False,
+                    "Value":      True,
+                    "Percentage": True,
+                    "Orders":     True,
+                    "Customers":  True,
+                },
+                color_continuous_scale=[
+                    [0.0, "#E8F5E9"],
+                    [0.2, "#81C784"],
+                    [0.4, "#4CAF50"],
+                    [0.6, "#2E7D32"],
+                    [1.0, "#1B5E20"],
+                ],
+                labels={"Value": metric_type, "Percentage": "Share (%)"},
+                title=f"Top {top_n_states} States — {metric_type}",
+            )
+            fig_map.update_geos(fitbounds="locations", visible=False)
+            fig_map.update_layout(
+                height=600,
+                margin=dict(l=0, r=0, t=40, b=0),
+                coloraxis_colorbar=dict(title=metric_type),
+                template="plotly_white",
+            )
+            st.plotly_chart(fig_map, use_container_width=True)
+
+        else:
+            # ── Fallback: treemap (works offline, no external deps) ───────────
+            st.info("ℹ️ Map tiles unavailable (network issue). Showing treemap instead.")
+            fig_tree = px.treemap(
+                plot_data,
+                path=[px.Constant("India"), "State"],
+                values="Value",
+                color="Value",
+                color_continuous_scale="RdYlGn",
+                title=f"State-wise {metric_type} Distribution ({period_label})",
+            )
+            fig_tree.update_traces(
+                texttemplate="<b>%{label}</b><br>%{value:,.0f}",
+            )
+            fig_tree.update_layout(height=600)
+            st.plotly_chart(fig_tree, use_container_width=True)
+
+    elif map_style == "Bubble Chart":
+        st.markdown(f"### 🫧 Bubble Chart — Market Concentration ({period_label})")
+
+        fig_bubble = px.scatter(
+            plot_data,
+            x="Customers",
+            y="Value",
+            size="Orders",
+            color="Revenue",
+            hover_name="State",
+            text="State",
+            size_max=60,
+            title=f"State Analysis: {metric_type} vs Customer Base",
+            labels={
+                "Customers": "Number of Customers",
+                "Value":     f"{metric_type}",
+                "Orders":    "Total Orders",
+                "Revenue":   f"Total Revenue ({CURRENCY})",
+            },
+            color_continuous_scale="Plasma",
+        )
+        fig_bubble.update_traces(
+            textposition="top center",
+            textfont=dict(size=10, color="black"),
+            marker=dict(line=dict(width=2, color="DarkSlateGrey")),
+        )
+        fig_bubble.update_layout(height=550, template="plotly_white")
+        st.plotly_chart(fig_bubble, use_container_width=True)
+
+    else:  # State Rankings Table
+        st.markdown(f"### 📋 State Rankings ({period_label})")
+
+        disp = plot_data.copy()
+        disp.insert(0, "Rank", range(1, len(disp) + 1))
+        disp["Revenue"]     = disp["Revenue"].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        disp["AvgOrder"]    = disp["AvgOrder"].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        disp["Percentage"]  = disp["Percentage"].apply(lambda x: f"{x:.2f}%")
+        disp["CumulativePct"] = disp["CumulativePct"].apply(lambda x: f"{x:.2f}%")
+        disp = disp[["Rank", "State", "Value", "Percentage", "CumulativePct",
+                     "Revenue", "Orders", "Customers", "Products", "AvgOrder"]]
+
+        def _highlight_top3(row):
+            if row["Rank"] == 1:
+                return ["background: linear-gradient(90deg,#FFD700,#FFA500)"] * len(row)
+            elif row["Rank"] == 2:
+                return ["background: linear-gradient(90deg,#C0C0C0,#E8E8E8)"] * len(row)
+            elif row["Rank"] == 3:
+                return ["background: linear-gradient(90deg,#CD7F32,#D4AF37)"] * len(row)
+            return [""] * len(row)
+
+        st.dataframe(
+            disp.style.apply(_highlight_top3, axis=1),
+            use_container_width=True,
+            height=500,
+        )
+
+    # ── KPI Cards ─────────────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown(f"### 📊 Geographic Intelligence ({period_label})")
+
+    col_geo1, col_geo2, col_geo3 = st.columns(3)
+    top_state = state_metrics.iloc[0]
+
+    with col_geo1:
+        val_prefix = CURRENCY if metric_type in ("Revenue", "Average Order Value") else ""
+        st.markdown(f"""
+            <div class="state-card">
+                <h4 style="margin:0;">🏆 #1 State</h4>
+                <h2 style="margin:10px 0; font-size:1.8rem;">{top_state['State']}</h2>
+                <p style="font-size:1.3rem; font-weight:600;">{val_prefix}{top_state['Value']:,.0f}</p>
+                <p>{top_state['Percentage']:.1f}% of total {metric_type.lower()}</p>
+                <hr style="border-color:rgba(255,255,255,0.3); margin:10px 0;">
+                <small>📦 {int(top_state['Orders'])} orders &nbsp;•&nbsp; 🏢 {int(top_state['Customers'])} customers</small>
+            </div>
+        """, unsafe_allow_html=True)
+
+    with col_geo2:
+        top5_share = state_metrics.head(5)['Percentage'].sum()
+        st.markdown(f"""
+            <div class="map-stats" style="border-left-color:#f093fb;">
+                <h4 style="margin:0; color:#6b7280;">📍 Market Concentration</h4>
+                <h2 style="margin:15px 0; font-size:2rem; color:#f093fb;">{top5_share:.1f}%</h2>
+                <p style="color:#6b7280;">Top 5 states contribution</p>
+                <hr style="margin:15px 0;">
+                <p style="margin:0;"><b>Active Markets:</b> {len(state_metrics)} states</p>
+                <p style="margin:5px 0 0 0;"><b>Total Customers:</b> {int(state_metrics['Customers'].sum())}</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    with col_geo3:
+        avg_rev = state_metrics['Revenue'].mean()
+        best_aov_state   = state_metrics.loc[state_metrics['AvgOrder'].idxmax(), 'State']
+        most_cust_state  = state_metrics.loc[state_metrics['Customers'].idxmax(), 'State']
+        st.markdown(f"""
+            <div class="map-stats" style="border-left-color:#4facfe;">
+                <h4 style="margin:0; color:#6b7280;">📈 Avg Performance</h4>
+                <h2 style="margin:15px 0; font-size:2rem; color:#4facfe;">{CURRENCY}{avg_rev:,.0f}</h2>
+                <p style="color:#6b7280;">Revenue per state (avg)</p>
+                <hr style="margin:15px 0;">
+                <p style="margin:0;"><b>Best AOV:</b> {best_aov_state}</p>
+                <p style="margin:5px 0 0 0;"><b>Most Customers:</b> {most_cust_state}</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # ── Pareto Chart ──────────────────────────────────────────────────────────
+    st.markdown("#### 📈 Pareto Analysis (80/20 Rule)")
+
+    pareto_data = state_metrics.head(15)
+    x_vals = list(range(len(pareto_data)))
+
+    fig_pareto = go.Figure()
+    fig_pareto.add_trace(go.Bar(
+        x=x_vals,
+        y=pareto_data['Value'],
+        name=metric_type,
+        marker_color='royalblue',
+        text=pareto_data['Value'].apply(
+            lambda v: f"{CURRENCY}{v/1e6:.1f}M" if v >= 1e6
+            else (f"{CURRENCY}{v/1e3:.0f}K" if v >= 1e3 else f"{v:.0f}")
+        ),
+        textposition='auto',
+    ))
+    fig_pareto.add_trace(go.Scatter(
+        x=x_vals,
+        y=pareto_data['CumulativePct'],
+        name='Cumulative %',
+        yaxis='y2',
+        line=dict(color='red', width=3),
+        marker=dict(size=8, symbol='diamond'),
+    ))
+    fig_pareto.add_hline(
+        y=80, line_dash="dash", line_color="green",
+        annotation_text="80% Threshold", yref='y2',
+    )
+    fig_pareto.update_layout(
+        title=f"Top 15 States — {metric_type} Contribution",
+        xaxis=dict(
+            tickmode='array',
+            tickvals=x_vals,
+            ticktext=[
+                (s[:12] + "…") if len(s) > 12 else s
+                for s in pareto_data['State']
+            ],
+            tickangle=-30,
+        ),
+        yaxis=dict(
+            title=f"{metric_type} ({CURRENCY if metric_type in ('Revenue','Average Order Value') else ''})",
+            side='left',
+        ),
+        yaxis2=dict(
+            title='Cumulative %', side='right', overlaying='y',
+            range=[0, 100], ticksuffix='%',
+        ),
+        height=450,
+        template='plotly_white',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+    )
+    st.plotly_chart(fig_pareto, use_container_width=True)
+
+    states_80 = state_metrics[state_metrics['CumulativePct'] <= 80]
+    if not states_80.empty:
+        st.success(
+            f"🎯 **Pareto Insight:** Top **{len(states_80)} states** "
+            f"({len(states_80)/len(state_metrics)*100:.1f}% of markets) "
+            f"generate **80%** of total {metric_type.lower()}."
+        )
+
+    # ── State Deep Dive ───────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 🔍 State Deep Dive")
+
+    selected_state_map = st.selectbox(
+        "Select State for Detailed Analysis:",
+        options=state_metrics['State'].tolist(),
+        index=0,
+        key="map_deep_dive_state",
+    )
+
+    if selected_state_map:
+        state_data_map = map_df[map_df['State'] == selected_state_map].copy()
+
+        col_detail1, col_detail2 = st.columns([2, 1])
+
+        with col_detail1:
+            st.markdown(f"#### 📊 {selected_state_map} — Performance Metrics")
+
+            monthly_state = (
+                state_data_map
+                .groupby(state_data_map['Date'].dt.to_period('M'))
+                .agg(Revenue=('Total_Amount', 'sum'), Orders=('Inquiry_No', 'nunique'))
+                .reset_index()
+            )
+            monthly_state['Date'] = monthly_state['Date'].dt.to_timestamp()
+
+            fig_state_trend = go.Figure()
+            fig_state_trend.add_trace(go.Scatter(
+                x=monthly_state['Date'],
+                y=monthly_state['Revenue'],
+                mode='lines+markers',
+                name='Revenue',
+                line=dict(width=3, color='#11998e'),
+                fill='tozeroy',
+                fillcolor='rgba(17,153,142,0.2)',
+            ))
+            fig_state_trend.update_layout(
+                title=f"Monthly Revenue Trend — {selected_state_map}",
+                xaxis_title="Month",
+                yaxis_title=f"Revenue ({CURRENCY})",
+                height=350,
+                template='plotly_white',
+            )
+            st.plotly_chart(fig_state_trend, use_container_width=True)
+
+        with col_detail2:
+            st.markdown("#### 🏆 Top Customers")
+            top_cust_map = (
+                state_data_map
+                .groupby('Company')
+                .agg(Revenue=('Total_Amount', 'sum'), Orders=('Inquiry_No', 'nunique'))
+                .sort_values('Revenue', ascending=False)
+                .head(5)
+            )
+            top_cust_map['Revenue'] = top_cust_map['Revenue'].apply(
+                lambda x: f"{CURRENCY}{x:,.0f}"
+            )
+            st.dataframe(top_cust_map, use_container_width=True)
+
+            st.markdown("#### 🏷️ Top Products")
+            top_prod_map = (
+                state_data_map
+                .groupby('Product')['Total_Amount']
+                .sum()
+                .sort_values(ascending=False)
+                .head(5)
+            )
+            st.bar_chart(top_prod_map)
+
+    # ── Export ──────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 📥 Export Geographic Data")
+
+    col_exp1, col_exp2 = st.columns(2)
+    with col_exp1:
+        st.download_button(
+            "📊 Export State Metrics (CSV)",
+            state_metrics.to_csv(index=False).encode('utf-8'),
+            f"state_metrics_{period_label.replace(' ', '_')}.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+    with col_exp2:
+        st.download_button(
+            "📍 Export All Orders with State (CSV)",
+            map_df.to_csv(index=False).encode('utf-8'),
+            f"orders_by_state_{period_label.replace(' ', '_')}.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+
+# ── END OF MAP ANALYTICS BLOCK ────────────────────────────────────────────────
 
 # ==========================================
 # REPORT 6: REVENUE TRENDS (ENHANCED)
@@ -1726,16 +3431,50 @@ elif report == "💰 Monthly Insights":
             st.write(f"{i}. **{month}**: {CURRENCY}{revenue:,.0f} ({pct:.1f}% of total)")
 
 # ==========================================
-# REPORT 9: TOP REVENUE SOURCES (ENHANCED)
+# REPORT 9: TOP REVENUE SOURCES (ENHANCED WITH YEAR FILTER)
 # ==========================================
 elif report == "💰 Top Revenue Sources":
     st.markdown("## 💰 Revenue Contribution & Distribution Analysis")
     
+    # Ensure Date column is datetime and extract Year
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    
+    # Get available years for dropdown
+    available_years = sorted(df['Year'].unique())
+    
+    # Year selection dropdown
+    col_year, col_view = st.columns([1, 2])
+    
+    with col_year:
+        year_option = st.selectbox(
+            "📅 Select Year:",
+            ["All Years"] + [str(y) for y in available_years],
+            help="Filter data by specific year or view all time"
+        )
+    
+    with col_view:
+        view_mode = st.selectbox(
+            "👁️ View Mode:",
+            ["Summary View", "Detailed Analysis", "Trend View"],
+            help="Choose display mode"
+        )
+    
+    # Filter data based on year selection
+    if year_option != "All Years":
+        selected_year = int(year_option)
+        analysis_df = df[df['Year'] == selected_year].copy()
+        period_label = f" ({selected_year})"
+    else:
+        analysis_df = df.copy()
+        period_label = ""
+    
     # Calculate contributions
-    total_revenue = df['Total_Amount'].sum()
+    total_revenue = analysis_df['Total_Amount'].sum()
     
     # State contribution
-    state_revenue = df.groupby('State').agg({
+    state_revenue = analysis_df.groupby('State').agg({
         'Total_Amount': ['sum', 'count', 'mean'],
         'Qty': 'sum'
     }).round(2)
@@ -1745,7 +3484,7 @@ elif report == "💰 Top Revenue Sources":
     state_revenue['Cumulative_Pct'] = state_revenue['Revenue_Pct'].cumsum().round(2)
     
     # Product contribution
-    product_revenue = df.groupby('Product').agg({
+    product_revenue = analysis_df.groupby('Product').agg({
         'Total_Amount': ['sum', 'count'],
         'Qty': 'sum',
         'State': 'nunique'
@@ -1755,8 +3494,20 @@ elif report == "💰 Top Revenue Sources":
     product_revenue['Revenue_Pct'] = (product_revenue['Revenue'] / total_revenue * 100).round(2)
     product_revenue['Cumulative_Pct'] = product_revenue['Revenue_Pct'].cumsum().round(2)
     
+    # Customer contribution (NEW FEATURE)
+    customer_revenue = analysis_df.groupby('Company').agg({
+        'Total_Amount': ['sum', 'count', 'mean'],
+        'Qty': 'sum',
+        'State': 'nunique',
+        'Product': 'nunique'
+    }).round(2)
+    customer_revenue.columns = ['Revenue', 'Orders', 'Avg_Order', 'Quantity', 'States', 'Products']
+    customer_revenue = customer_revenue.sort_values('Revenue', ascending=False)
+    customer_revenue['Revenue_Pct'] = (customer_revenue['Revenue'] / total_revenue * 100).round(2)
+    customer_revenue['Cumulative_Pct'] = customer_revenue['Revenue_Pct'].cumsum().round(2)
+    
     # TOP SUMMARY CARDS
-    st.markdown("### 📊 Market Overview")
+    st.markdown(f"### 📊 Market Overview{period_label}")
     cols = st.columns(4)
     with cols[0]:
         st.metric("🗺️ Total States", len(state_revenue))
@@ -1772,6 +3523,135 @@ elif report == "💰 Top Revenue Sources":
     
     st.markdown("---")
     
+    # View mode content
+    if view_mode == "Summary View":
+        # Your original visualization code
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("#### 🗺️ Top 10 States")
+            fig_states = px.bar(
+                state_revenue.head(10).reset_index(),
+                x='Revenue',
+                y='State',
+                orientation='h',
+                color='Revenue_Pct',
+                color_continuous_scale='Viridis',
+                text=state_revenue.head(10)['Revenue'].apply(lambda x: f'{CURRENCY}{x/1000:.0f}K')
+            )
+            fig_states.update_traces(textposition='outside')
+            fig_states.update_layout(yaxis=dict(autorange="reversed"), height=400)
+            st.plotly_chart(fig_states, use_container_width=True)
+        
+        with col2:
+            st.markdown("#### 🔧 Top 10 Products")
+            fig_products = px.bar(
+                product_revenue.head(10).reset_index(),
+                x='Revenue',
+                y='Product',
+                orientation='h',
+                color='Revenue_Pct',
+                color_continuous_scale='Plasma',
+                text=product_revenue.head(10)['Revenue'].apply(lambda x: f'{CURRENCY}{x/1000:.0f}K')
+            )
+            fig_products.update_traces(textposition='outside')
+            fig_products.update_layout(yaxis=dict(autorange="reversed"), height=400)
+            st.plotly_chart(fig_products, use_container_width=True)
+    
+    elif view_mode == "Detailed Analysis":
+        # Detailed tables with formatting
+        col_det1, col_det2 = st.columns(2)
+        
+        with col_det1:
+            st.markdown(f"#### 📋 State Details{period_label}")
+            display_state = state_revenue.head(15).copy()
+            display_state['Revenue'] = display_state['Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_state['Avg_Order'] = display_state['Avg_Order'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_state['Revenue_Pct'] = display_state['Revenue_Pct'].apply(lambda x: f"{x:.2f}%")
+            display_state['Cumulative_Pct'] = display_state['Cumulative_Pct'].apply(lambda x: f"{x:.2f}%")
+            st.dataframe(display_state, use_container_width=True, height=400)
+        
+        with col_det2:
+            st.markdown(f"#### 📋 Product Details{period_label}")
+            display_product = product_revenue.head(15).copy()
+            display_product['Revenue'] = display_product['Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_product['Revenue_Pct'] = display_product['Revenue_Pct'].apply(lambda x: f"{x:.2f}%")
+            display_product['Cumulative_Pct'] = display_product['Cumulative_Pct'].apply(lambda x: f"{x:.2f}%")
+            st.dataframe(display_product, use_container_width=True, height=400)
+        
+        # NEW: Top Customers section
+        st.markdown("---")
+        st.markdown(f"#### 👥 Top 10 Customers{period_label}")
+        display_customer = customer_revenue.head(10).copy()
+        display_customer['Revenue'] = display_customer['Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_customer['Avg_Order'] = display_customer['Avg_Order'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_customer['Revenue_Pct'] = display_customer['Revenue_Pct'].apply(lambda x: f"{x:.2f}%")
+        st.dataframe(display_customer, use_container_width=True)
+    
+    else:  # Trend View
+        # Monthly trend analysis
+        st.markdown(f"#### 📈 Monthly Revenue Trend{period_label}")
+        
+        monthly_trend = analysis_df.groupby(analysis_df['Date'].dt.to_period('M')).agg({
+            'Total_Amount': 'sum',
+            'Inquiry_No': 'count'
+        }).reset_index()
+        monthly_trend['Date'] = monthly_trend['Date'].dt.to_timestamp()
+        monthly_trend.columns = ['Month', 'Revenue', 'Orders']
+        
+        fig_trend = go.Figure()
+        fig_trend.add_trace(go.Scatter(
+            x=monthly_trend['Month'],
+            y=monthly_trend['Revenue'],
+            mode='lines+markers',
+            name='Revenue',
+            line=dict(width=3, color='royalblue'),
+            fill='tozeroy'
+        ))
+        
+        fig_trend.update_layout(
+            title=f"Revenue Trend{period_label}",
+            xaxis_title="Month",
+            yaxis_title=f"Revenue ({CURRENCY})",
+            height=450,
+            template='plotly_white'
+        )
+        st.plotly_chart(fig_trend, use_container_width=True)
+        
+        # Show monthly data table
+        st.markdown(f"#### 📊 Monthly Breakdown{period_label}")
+        monthly_display = monthly_trend.copy()
+        monthly_display['Revenue'] = monthly_display['Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        monthly_display['Month'] = monthly_display['Month'].dt.strftime('%b %Y')
+        st.dataframe(monthly_display, use_container_width=True, hide_index=True)
+    
+    # Export section
+    st.markdown("---")
+    col_exp1, col_exp2, col_exp3 = st.columns(3)
+    
+    with col_exp1:
+        st.download_button(
+            "📥 Export States",
+            state_revenue.to_csv().encode('utf-8'),
+            f"state_revenue{period_label.replace(' ', '_')}.csv"
+        )
+    
+    with col_exp2:
+        st.download_button(
+            "📥 Export Products",
+            product_revenue.to_csv().encode('utf-8'),
+            f"product_revenue{period_label.replace(' ', '_')}.csv"
+        )
+    
+    with col_exp3:
+        st.download_button(
+            "📥 Export Customers",
+            customer_revenue.to_csv().encode('utf-8'),
+            f"customer_revenue{period_label.replace(' ', '_')}.csv"
+        )
+
+    
+    #9-10 Between but diffrent 
     # ==========================================
     # STATE-WISE CONTRIBUTION (ENHANCED)
     # ==========================================
@@ -2085,81 +3965,1550 @@ elif report == "🔧 Product Performance":
             use_container_width=True,
             height=500
         )
-
 # ==========================================
-# REPORT 11: PRODUCT TRENDS
+# REPORT 11: PRODUCT TRENDS (ENHANCED)
 # ==========================================
 elif report == "🔧 Product Trends":
     st.markdown("## 🔧 Product Trends Over Time")
+    st.markdown("---")
     
-    # Select products to compare
-    top_products = df.groupby('Product')['Total_Amount'].sum().nlargest(10).index.tolist()
-    selected_products = st.multiselect("🔧 Select Products to Compare:", top_products, default=top_products[:5])
+    # Ensure Date column is datetime and extract Year
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    df['Month'] = df['Date'].dt.month
+    df['Quarter'] = df['Date'].dt.quarter
+    df['Month_Name'] = df['Date'].dt.strftime('%b')
+    df['Year_Month'] = df['Date'].dt.to_period('M')
     
-    if selected_products:
-        fig = go.Figure()
-        for product in selected_products:
-            prod_df = df[df['Product'] == product]
-            monthly = prod_df.groupby(prod_df['Date'].dt.to_period('M'))['Total_Amount'].sum()
-            monthly.index = monthly.index.to_timestamp()
-            fig.add_trace(go.Scatter(x=monthly.index, y=monthly.values, 
-                                   mode='lines+markers', name=product))
+    # Get available years
+    available_years = sorted(df['Year'].unique())
+    
+    # Header controls
+    col_year, col_metric, col_period = st.columns([1, 1, 1])
+    
+    with col_year:
+        year_option = st.selectbox(
+            "📅 Select Period:",
+            ["All Years"] + [str(y) for y in available_years],
+            help="Analyze trends across specific time period"
+        )
+    
+    with col_metric:
+        trend_metric = st.selectbox(
+            "📊 Metric:",
+            ["Revenue", "Quantity", "Orders", "Market Share"],
+            help="Choose metric for trend analysis"
+        )
+    
+    with col_period:
+        time_period = st.selectbox(
+            "⏱️ Time Grouping:",
+            ["Monthly", "Quarterly", "Yearly"],
+            help="Aggregate data by time period"
+        )
+    
+    # Filter data based on year
+    if year_option != "All Years":
+        selected_year = int(year_option)
+        analysis_df = df[df['Year'] == selected_year].copy()
+        period_label = f" ({selected_year})"
+    else:
+        analysis_df = df.copy()
+        period_label = " (All Time)"
+    
+    # Metric mapping
+    metric_map = {
+        "Revenue": ("Total_Amount", "sum"),
+        "Quantity": ("Qty", "sum"),
+        "Orders": ("Inquiry_No", "count"),
+        "Market Share": ("Total_Amount", "sum")  # Special calculation
+    }
+    metric_col, agg_func = metric_map[trend_metric]
+    
+    # Product selection with categories
+    st.markdown("### 🏷️ Product Selection")
+    
+    # Get top products by selected metric
+    if agg_func == "count":
+        product_ranking = analysis_df.groupby('Product')['Inquiry_No'].count().sort_values(ascending=False)
+    else:
+        product_ranking = analysis_df.groupby('Product')[metric_col].sum().sort_values(ascending=False)
+    
+    top_products = product_ranking.head(20).index.tolist()
+    
+    col_prod1, col_prod2 = st.columns([3, 1])
+    
+    with col_prod1:
+        selected_products = st.multiselect(
+            "🔧 Select Products to Compare:", 
+            top_products, 
+            default=top_products[:5] if len(top_products) >= 5 else top_products,
+            help="Choose multiple products to compare trends"
+        )
+    
+    with col_prod2:
+        select_all = st.checkbox("Select All Top 20", value=False)
+        if select_all:
+            selected_products = top_products
+    
+    if not selected_products:
+        st.warning("⚠️ Please select at least one product")
+        st.stop()
+    
+    # Prepare time series data
+    def prepare_time_series(data, products, period):
+        """Prepare time series data based on selected period"""
+        result = {}
         
-        fig.update_layout(title='Product-wise Monthly Trends', height=500)
+        for product in products:
+            prod_df = data[data['Product'] == product].copy()
+            
+            if period == "Monthly":
+                grouped = prod_df.groupby(prod_df['Date'].dt.to_period('M'))
+            elif period == "Quarterly":
+                grouped = prod_df.groupby([prod_df['Year'], prod_df['Quarter']])
+            else:  # Yearly
+                grouped = prod_df.groupby('Year')
+            
+            if agg_func == "count":
+                series = grouped.size()
+            else:
+                series = grouped[metric_col].sum()
+            
+            # Convert index to datetime for consistent plotting
+            if period == "Monthly":
+                series.index = series.index.to_timestamp()
+            elif period == "Quarterly":
+                series.index = pd.to_datetime(
+                    series.index.map(lambda x: f"{x[0]}-{x[1]*3-2:02d}-01")
+                )
+            else:
+                series.index = pd.to_datetime(series.index, format='%Y')
+            
+            result[product] = series
+        
+        return result
+    
+    time_series_data = prepare_time_series(analysis_df, selected_products, time_period)
+    
+    # Create DataFrame for easier manipulation
+    trend_df = pd.DataFrame(time_series_data).fillna(0)
+    
+    # Calculate market share if selected
+    if trend_metric == "Market Share":
+        total_by_period = trend_df.sum(axis=1)
+        trend_df = trend_df.div(total_by_period, axis=0) * 100
+    
+    # Main visualization tabs
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📈 Trend Lines", 
+        "📊 Comparative Analysis", 
+        "🎯 Growth Metrics", 
+        "🔍 Seasonality"
+    ])
+    
+    with tab1:
+        st.markdown(f"#### 📈 {trend_metric} Trends{period_label}")
+        
+        chart_type = st.radio(
+            "Chart Type:",
+            ["Line Chart", "Area Chart", "Stacked Area", "Candlestick Style"],
+            horizontal=True,
+            key="trend_chart_type"
+        )
+        
+        fig = go.Figure()
+        
+        colors = px.colors.qualitative.Set1 + px.colors.qualitative.Set2 + px.colors.qualitative.Set3
+        
+        for idx, product in enumerate(selected_products):
+            color = colors[idx % len(colors)]
+            
+            if chart_type == "Line Chart":
+                fig.add_trace(go.Scatter(
+                    x=trend_df.index,
+                    y=trend_df[product],
+                    mode='lines+markers',
+                    name=product,
+                    line=dict(width=3, color=color),
+                    marker=dict(size=8, color=color)
+                ))
+            
+            elif chart_type == "Area Chart":
+                fig.add_trace(go.Scatter(
+                    x=trend_df.index,
+                    y=trend_df[product],
+                    fill='tozeroy',
+                    name=product,
+                    line=dict(width=2, color=color),
+                    fillcolor=color.replace(')', ', 0.3)').replace('rgb', 'rgba')
+                ))
+            
+            elif chart_type == "Stacked Area":
+                fig.add_trace(go.Scatter(
+                    x=trend_df.index,
+                    y=trend_df[product],
+                    stackgroup='one',
+                    name=product,
+                    line=dict(width=1, color=color),
+                    fillcolor=color
+                ))
+            
+            else:  # Candlestick Style (showing min, max, start, end for grouped periods)
+                # For simplicity, show range as filled area
+                fig.add_trace(go.Scatter(
+                    x=trend_df.index,
+                    y=trend_df[product],
+                    fill='tozeroy',
+                    name=product,
+                    line=dict(width=2, color=color)
+                ))
+        
+        # Add trend line for total if multiple products
+        if len(selected_products) > 1 and chart_type != "Stacked Area":
+            total_line = trend_df.sum(axis=1)
+            fig.add_trace(go.Scatter(
+                x=total_line.index,
+                y=total_line.values,
+                mode='lines',
+                name='TOTAL',
+                line=dict(width=4, color='black', dash='dash'),
+                opacity=0.7
+            ))
+        
+        y_axis_title = f"{trend_metric} ({'%' if trend_metric == 'Market Share' else CURRENCY if trend_metric == 'Revenue' else 'Units'})"
+        
+        fig.update_layout(
+            title=f'{trend_metric} Trends - {time_period} View',
+            xaxis_title="Time Period",
+            yaxis_title=y_axis_title,
+            height=550,
+            template='plotly_white',
+            hovermode='x unified',
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.3,
+                xanchor="center",
+                x=0.5
+            )
+        )
+        
         st.plotly_chart(fig, use_container_width=True)
-
+        
+        # Summary statistics
+        col_stat1, col_stat2, col_stat3 = st.columns(3)
+        
+        with col_stat1:
+            total_value = trend_df.sum().sum()
+            prefix = CURRENCY if trend_metric == "Revenue" else ""
+            suffix = "%" if trend_metric == "Market Share" else ""
+            st.metric(
+                f"Total {trend_metric}",
+                f"{prefix}{total_value:,.0f}{suffix}"
+            )
+        
+        with col_stat2:
+            avg_period = trend_df.sum(axis=1).mean()
+            st.metric(
+                f"Avg per {time_period[:-2]}",
+                f"{prefix}{avg_period:,.0f}{suffix}"
+            )
+        
+        with col_stat3:
+            peak_period = trend_df.sum(axis=1).idxmax()
+            st.metric(
+                "Peak Period",
+                peak_period.strftime('%b %Y') if hasattr(peak_period, 'strftime') else str(peak_period)
+            )
+    
+    with tab2:
+        st.markdown("#### 📊 Comparative Performance Matrix")
+        
+        # Calculate performance metrics for each product
+        comparison_metrics = []
+        
+        for product in selected_products:
+            series = trend_df[product]
+            
+            metrics = {
+                'Product': product,
+                'Total': series.sum(),
+                'Average': series.mean(),
+                'Peak': series.max(),
+                'Min': series.min(),
+                'Std_Dev': series.std(),
+                'Growth_Rate': ((series.iloc[-1] - series.iloc[0]) / series.iloc[0] * 100) if len(series) > 1 and series.iloc[0] != 0 else 0,
+                'Volatility': (series.std() / series.mean() * 100) if series.mean() != 0 else 0
+            }
+            comparison_metrics.append(metrics)
+        
+        comp_df = pd.DataFrame(comparison_metrics).sort_values('Total', ascending=False)
+        
+        # Display as table
+        display_comp = comp_df.copy()
+        prefix = CURRENCY if trend_metric == "Revenue" else ""
+        suffix = "%" if trend_metric == "Market Share" else ""
+        
+        for col in ['Total', 'Average', 'Peak', 'Min']:
+            display_comp[col] = display_comp[col].apply(lambda x: f"{prefix}{x:,.0f}{suffix}")
+        
+        display_comp['Std_Dev'] = display_comp['Std_Dev'].apply(lambda x: f"{prefix}{x:,.0f}")
+        display_comp['Growth_Rate'] = display_comp['Growth_Rate'].apply(lambda x: f"{x:+.1f}%")
+        display_comp['Volatility'] = display_comp['Volatility'].apply(lambda x: f"{x:.1f}%")
+        
+        st.dataframe(display_comp, use_container_width=True, hide_index=True)
+        
+        # Radar chart comparison
+        st.markdown("#### 🕸️ Multi-Dimensional Comparison")
+        
+        # Normalize metrics for radar chart (0-100 scale)
+        radar_metrics = ['Total', 'Average', 'Peak', 'Growth_Rate']
+        radar_df = comp_df[['Product'] + radar_metrics].copy()
+        
+        # Normalize to 0-100 scale
+        for metric in radar_metrics:
+            min_val = radar_df[metric].min()
+            max_val = radar_df[metric].max()
+            if max_val > min_val:
+                radar_df[metric] = ((radar_df[metric] - min_val) / (max_val - min_val)) * 100
+            else:
+                radar_df[metric] = 50
+        
+        fig_radar = go.Figure()
+        
+        for idx, row in radar_df.iterrows():
+            fig_radar.add_trace(go.Scatterpolar(
+                r=[row[m] for m in radar_metrics] + [row[radar_metrics[0]]],
+                theta=radar_metrics + [radar_metrics[0]],
+                fill='toself',
+                name=row['Product'],
+                opacity=0.6
+            ))
+        
+        fig_radar.update_layout(
+            polar=dict(
+                radialaxis=dict(visible=True, range=[0, 100])
+            ),
+            showlegend=True,
+            title="Performance Comparison (Normalized)",
+            height=500,
+            template='plotly_white'
+        )
+        
+        st.plotly_chart(fig_radar, use_container_width=True)
+    
+    with tab3:
+        st.markdown("#### 🎯 Growth & Momentum Analysis")
+        
+        # Calculate month-over-month or period-over-period growth
+        growth_df = trend_df.pct_change() * 100
+        
+        col_growth1, col_growth2 = st.columns(2)
+        
+        with col_growth1:
+            st.markdown("**📈 Period-over-Period Growth Rate (%)**")
+            
+            fig_growth = go.Figure()
+            
+            for idx, product in enumerate(selected_products):
+                fig_growth.add_trace(go.Bar(
+                    name=product,
+                    x=growth_df.index,
+                    y=growth_df[product],
+                    marker_color=colors[idx % len(colors)]
+                ))
+            
+            fig_growth.update_layout(
+                barmode='group',
+                title=f'{time_period} Growth Rate',
+                yaxis_title="Growth %",
+                height=400,
+                template='plotly_white',
+                showlegend=True
+            )
+            
+            fig_growth.add_hline(y=0, line_dash="dash", line_color="black")
+            
+            st.plotly_chart(fig_growth, use_container_width=True)
+        
+        with col_growth2:
+            st.markdown("**🎢 Cumulative Growth**")
+            
+            # Calculate cumulative growth from first period
+            cumulative_df = ((trend_df / trend_df.iloc[0] - 1) * 100) if len(trend_df) > 0 else trend_df
+            
+            fig_cum = go.Figure()
+            
+            for idx, product in enumerate(selected_products):
+                fig_cum.add_trace(go.Scatter(
+                    x=cumulative_df.index,
+                    y=cumulative_df[product],
+                    mode='lines',
+                    name=product,
+                    line=dict(width=3, color=colors[idx % len(colors)]),
+                    stackgroup=None
+                ))
+            
+            fig_cum.update_layout(
+                title='Cumulative Growth from Start',
+                yaxis_title="Cumulative Growth %",
+                height=400,
+                template='plotly_white',
+                hovermode='x unified'
+            )
+            
+            fig_cum.add_hline(y=0, line_dash="dash", line_color="black")
+            
+            st.plotly_chart(fig_cum, use_container_width=True)
+        
+        # Growth insights
+        st.markdown("#### 💡 Growth Insights")
+        
+        # Best and worst performers
+        total_growth = {}
+        for product in selected_products:
+            series = trend_df[product]
+            if len(series) >= 2 and series.iloc[0] != 0:
+                growth = ((series.iloc[-1] - series.iloc[0]) / series.iloc[0]) * 100
+                total_growth[product] = growth
+        
+        if total_growth:
+            best_product = max(total_growth, key=total_growth.get)
+            worst_product = min(total_growth, key=total_growth.get)
+            
+            col_ins1, col_ins2 = st.columns(2)
+            
+            with col_ins1:
+                st.success(f"🏆 **Best Performer:** {best_product}  \n"
+                          f"Total Growth: {total_growth[best_product]:+.1f}%")
+            
+            with col_ins2:
+                if total_growth[worst_product] < 0:
+                    st.error(f"📉 **Needs Attention:** {worst_product}  \n"
+                            f"Total Growth: {total_growth[worst_product]:+.1f}%")
+                else:
+                    st.info(f"📊 **Slowest Growth:** {worst_product}  \n"
+                           f"Total Growth: {total_growth[worst_product]:+.1f}%")
+    
+    with tab4:
+        st.markdown("#### 🔍 Seasonality Patterns")
+        
+        if time_period == "Monthly" and len(analysis_df) > 0:
+            # Aggregate by month across all years
+            seasonality_df = analysis_df[analysis_df['Product'].isin(selected_products)].copy()
+            
+            monthly_pattern = seasonality_df.groupby(['Product', 'Month']).agg({
+                metric_col: agg_func if agg_func != 'count' else 'size'
+            }).reset_index()
+            
+            # Pivot for heatmap
+            pivot_seasonal = monthly_pattern.pivot(index='Product', columns='Month', values=metric_col).fillna(0)
+            
+            # Reorder columns to start from January
+            pivot_seasonal = pivot_seasonal[[i for i in range(1, 13) if i in pivot_seasonal.columns]]
+            
+            fig_heatmap = px.imshow(
+                pivot_seasonal,
+                labels=dict(x="Month", y="Product", color=trend_metric),
+                x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][:len(pivot_seasonal.columns)],
+                y=pivot_seasonal.index,
+                color_continuous_scale="RdYlGn",
+                aspect="auto",
+                title=f"Seasonal Heatmap - {trend_metric} by Month",
+                template='plotly_white'
+            )
+            
+            fig_heatmap.update_layout(height=max(400, len(selected_products) * 40))
+            st.plotly_chart(fig_heatmap, use_container_width=True)
+            
+            # Seasonal index calculation
+            st.markdown("#### 📊 Seasonal Index (Average = 100)")
+            
+            seasonal_index = pivot_seasonal.div(pivot_seasonal.mean(axis=1), axis=0) * 100
+            
+            fig_index = go.Figure()
+            
+            for product in selected_products:
+                if product in seasonal_index.index:
+                    fig_index.add_trace(go.Scatter(
+                        x=list(range(1, 13)),
+                        y=seasonal_index.loc[product].values,
+                        mode='lines+markers',
+                        name=product,
+                        line=dict(width=2)
+                    ))
+            
+            fig_index.add_hline(y=100, line_dash="dash", line_color="black", 
+                               annotation_text="Average")
+            
+            fig_index.update_layout(
+                title="Seasonal Index by Month",
+                xaxis=dict(
+                    tickmode='array',
+                    tickvals=list(range(1, 13)),
+                    ticktext=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                ),
+                yaxis_title="Index (100 = Average)",
+                height=450,
+                template='plotly_white',
+                hovermode='x unified'
+            )
+            
+            st.plotly_chart(fig_index, use_container_width=True)
+            
+            # Peak season identification
+            st.markdown("#### 🎯 Peak Season Insights")
+            
+            for product in selected_products:
+                if product in seasonal_index.index:
+                    peak_month = seasonal_index.loc[product].idxmax()
+                    low_month = seasonal_index.loc[product].idxmin()
+                    peak_value = seasonal_index.loc[product].max()
+                    low_value = seasonal_index.loc[product].min()
+                    
+                    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                    
+                    col_peak1, col_peak2 = st.columns(2)
+                    with col_peak1:
+                        st.success(f"**{product}**  \n"
+                                  f"🔥 Peak: {months[peak_month-1]} ({peak_value:.0f} index)  \n"
+                                  f"❄️ Low: {months[low_month-1]} ({low_value:.0f} index)")
+        
+        else:
+            st.info("ℹ️ Switch to 'Monthly' time grouping to view seasonality analysis")
+    
+    # Data table at bottom
+    with st.expander("📋 View Raw Trend Data"):
+        display_trend = trend_df.copy()
+        if trend_metric != "Market Share":
+            prefix = CURRENCY if trend_metric == "Revenue" else ""
+            display_trend = display_trend.applymap(lambda x: f"{prefix}{x:,.0f}")
+        else:
+            display_trend = display_trend.applymap(lambda x: f"{x:.1f}%")
+        
+        st.dataframe(display_trend, use_container_width=True)
+        
+        # Export option
+        csv = trend_df.to_csv().encode('utf-8')
+        st.download_button(
+            label="📥 Export Trend Data (CSV)",
+            data=csv,
+            file_name=f"product_trends_{year_option.replace(' ', '_')}.csv",
+            mime='text/csv'
+        )
 # ==========================================
-# REPORT 12: BEST SELLERS BY STATE
+# REPORT 12: BEST SELLERS BY STATE (ENHANCED & FIXED)
 # ==========================================
 elif report == "🔧 Best Sellers by State":
     st.markdown("## 🔧 Best Selling Products by State")
+    st.markdown("---")
     
-    state = st.selectbox("🗺️ Select State:", sorted(df['State'].unique()))
+    # Ensure Date column is datetime and extract Year
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
     
-    if state:
-        state_df = df[df['State'] == state]
+    # Get available years
+    available_years = sorted(df['Year'].unique())
+    
+    # Filters row
+    col_state, col_year, col_metric = st.columns([2, 1, 1])
+    
+    with col_state:
+        selected_state = st.selectbox(
+            "🗺️ Select State:", 
+            sorted(df['State'].unique()),
+            help="Choose a state to analyze top products"
+        )
+    
+    with col_year:
+        year_options = ["All Years"] + [str(y) for y in available_years]
+        selected_year_option = st.selectbox(
+            "📅 Year:", 
+            year_options,
+            help="Filter by specific year or view all time data"
+        )
+    
+    with col_metric:
+        ranking_metric = st.selectbox(
+            "📊 Rank By:",
+            ["Revenue", "Quantity", "Orders"],
+            help="Choose metric to rank products"
+        )
+    
+    # Filter data
+    state_df = df[df['State'] == selected_state].copy()
+    
+    if selected_year_option != "All Years":
+        selected_year = int(selected_year_option)
+        state_df = state_df[state_df['Year'] == selected_year]
+        year_label = f" ({selected_year})"
+    else:
+        year_label = " (All Time)"
+    
+    if state_df.empty:
+        st.warning(f"⚠️ No data available for {selected_state}{year_label}")
+        st.stop()
+    
+    # Calculate metrics based on selection
+    if ranking_metric == "Revenue":
+        metric_col = 'Total_Amount'
+        agg_func = 'sum'
+        currency_prefix = CURRENCY
+        chart_color_scale = 'Viridis'
+    elif ranking_metric == "Quantity":
+        metric_col = 'Qty'
+        agg_func = 'sum'
+        currency_prefix = ""
+        chart_color_scale = 'Plasma'
+    else:  # Orders
+        metric_col = 'Inquiry_No'
+        agg_func = 'count'
+        currency_prefix = ""
+        chart_color_scale = 'Inferno'
+    
+    # Aggregate data - FIXED: Check available columns first
+    agg_dict = {
+        'Total_Amount': 'sum',
+        'Qty': 'sum',
+        'Inquiry_No': 'count'
+    }
+    
+    # Only add Unit_Price if it exists
+    if 'Unit_Price' in state_df.columns:
+        agg_dict['Unit_Price'] = 'mean'
+    
+    product_stats = state_df.groupby('Product').agg(agg_dict).rename(columns={'Inquiry_No': 'Orders'})
+    
+    # Calculate additional metrics
+    product_stats['Avg_Order_Value'] = product_stats['Total_Amount'] / product_stats['Orders']
+    
+    # Calculate market share based on selected metric
+    if ranking_metric == "Orders":
+        total_metric = product_stats['Orders'].sum()
+        product_stats['Market_Share'] = (product_stats['Orders'] / total_metric * 100)
+    elif ranking_metric == "Quantity":
+        total_metric = product_stats['Qty'].sum()
+        product_stats['Market_Share'] = (product_stats['Qty'] / total_metric * 100)
+    else:
+        total_metric = product_stats['Total_Amount'].sum()
+        product_stats['Market_Share'] = (product_stats['Total_Amount'] / total_metric * 100)
+    
+    # Sort by selected metric
+    if ranking_metric == "Orders":
+        sort_col = 'Orders'
+    elif ranking_metric == "Quantity":
+        sort_col = 'Qty'
+    else:
+        sort_col = 'Total_Amount'
+    
+    top_products = product_stats.sort_values(sort_col, ascending=False).head(20)
+    
+    # Header with metrics
+    st.markdown(f"### 📈 Top Performing Products in **{selected_state}**{year_label}")
+    
+    # KPI Cards
+    col_kpi1, col_kpi2, col_kpi3, col_kpi4 = st.columns(4)
+    
+    with col_kpi1:
+        total_revenue = state_df['Total_Amount'].sum()
+        st.metric(
+            "Total Revenue", 
+            f"{CURRENCY}{total_revenue:,.0f}",
+            help="Total revenue for selected state and period"
+        )
+    
+    with col_kpi2:
+        total_orders = state_df['Inquiry_No'].nunique()
+        st.metric("Total Orders", f"{total_orders:,}")
+    
+    with col_kpi3:
+        top_product = top_products.index[0] if not top_products.empty else "N/A"
+        st.metric("Top Product", top_product[:20] + "..." if len(str(top_product)) > 20 else top_product)
+    
+    with col_kpi4:
+        top_product_share = top_products.iloc[0]['Market_Share'] if not top_products.empty else 0
+        st.metric("Top Product Share", f"{top_product_share:.1f}%")
+    
+    st.markdown("---")
+    
+    # Main content tabs
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "🏆 Rankings", 
+        "📊 Visual Analysis", 
+        "📈 Trends", 
+        "🔍 Detailed Breakdown"
+    ])
+    
+    with tab1:
+        col_chart, col_table = st.columns([3, 2])
         
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            top_products = state_df.groupby('Product')['Total_Amount'].sum().nlargest(15)
-            fig = px.bar(top_products, orientation='h', color=top_products.values,
-                        color_continuous_scale='Spectral')
-            fig.update_layout(yaxis=dict(autorange="reversed"))
+        with col_chart:
+            st.markdown(f"#### Top 15 Products by {ranking_metric}")
+            
+            # Create enhanced bar chart
+            display_df = top_products.head(15).reset_index()
+            display_df['Rank'] = range(1, len(display_df) + 1)
+            
+            # Determine color based on ranking metric
+            if ranking_metric == "Revenue":
+                color_col = 'Total_Amount'
+                hover_data = ['Qty', 'Orders', 'Avg_Order_Value']
+            elif ranking_metric == "Quantity":
+                color_col = 'Qty'
+                hover_data = ['Total_Amount', 'Orders', 'Avg_Order_Value']
+            else:
+                color_col = 'Orders'
+                hover_data = ['Total_Amount', 'Qty', 'Avg_Order_Value']
+            
+            fig = px.bar(
+                display_df,
+                y='Product',
+                x=sort_col,
+                orientation='h',
+                color=color_col,
+                color_continuous_scale=chart_color_scale,
+                title=f"Best Sellers - {selected_state}{year_label}",
+                labels={sort_col: ranking_metric, 'Product': ''},
+                hover_data=hover_data,
+                text=sort_col
+            )
+            
+            fig.update_traces(
+                texttemplate=f'{currency_prefix}' + '%{text:,.0f}',
+                textposition='outside',
+                textfont=dict(size=10)
+            )
+            
+            fig.update_layout(
+                height=600,
+                yaxis=dict(autorange="reversed", categoryorder='total ascending'),
+                xaxis_title=ranking_metric,
+                template='plotly_white',
+                coloraxis_colorbar=dict(title=ranking_metric)
+            )
+            
             st.plotly_chart(fig, use_container_width=True)
         
-        with col2:
-            st.markdown(f"### 📋 Top Products in {state}")
-            st.dataframe(top_products.reset_index().rename(columns={'Total_Amount': 'Revenue'}),
-                        use_container_width=True)
-
+        with col_table:
+            st.markdown("#### 📋 Detailed Rankings")
+            
+            # Prepare display table
+            display_table = top_products.head(15).copy()
+            display_table['Rank'] = range(1, len(display_table) + 1)
+            
+            # Format columns
+            display_table['Revenue'] = display_table['Total_Amount'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_table['Quantity'] = display_table['Qty'].apply(lambda x: f"{x:,.0f}")
+            display_table['Orders'] = display_table['Orders'].apply(lambda x: f"{x:,}")
+            display_table['Avg_Order'] = display_table['Avg_Order_Value'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            display_table['Market_Share'] = display_table['Market_Share'].apply(lambda x: f"{x:.1f}%")
+            
+            # Reorder columns
+            display_table = display_table[['Rank', 'Revenue', 'Quantity', 'Orders', 'Avg_Order', 'Market_Share']]
+            
+            # Apply styling
+            def highlight_top3(row):
+                if row['Rank'] == 1:
+                    return ['background: linear-gradient(90deg, #FFD700, #FFA500)'] * len(row)
+                elif row['Rank'] == 2:
+                    return ['background: linear-gradient(90deg, #C0C0C0, #A0A0A0)'] * len(row)
+                elif row['Rank'] == 3:
+                    return ['background: linear-gradient(90deg, #CD7F32, #B87333)'] * len(row)
+                return [''] * len(row)
+            
+            st.dataframe(
+                display_table.style.apply(highlight_top3, axis=1),
+                use_container_width=True,
+                height=600,
+                hide_index=False
+            )
+    
+    with tab2:
+        col_treemap, col_pie = st.columns(2)
+        
+        with col_treemap:
+            st.markdown("#### 🗺️ Revenue Distribution (Treemap)")
+            
+            fig_treemap = px.treemap(
+                top_products.head(10).reset_index(),
+                path=[px.Constant(selected_state), 'Product'],
+                values='Total_Amount',
+                color='Total_Amount',
+                color_continuous_scale='RdYlBu',
+                title=f"Top 10 Products Revenue Share"
+            )
+            fig_treemap.update_layout(height=500, template='plotly_white')
+            fig_treemap.update_traces(
+                textinfo="label+value+percent parent",
+                texttemplate='<b>%{label}</b><br>%{value:,.0f}<br>(%{percentParent:.1%})'
+            )
+            st.plotly_chart(fig_treemap, use_container_width=True)
+        
+        with col_pie:
+            st.markdown("#### 🥧 Market Share (Top 10)")
+            
+            pie_data = top_products.head(10).reset_index()
+            others_revenue = product_stats['Total_Amount'].sum() - pie_data['Total_Amount'].sum()
+            
+            if others_revenue > 0:
+                pie_data = pd.concat([
+                    pie_data,
+                    pd.DataFrame([{'Product': 'Others', 'Total_Amount': others_revenue}])
+                ], ignore_index=True)
+            
+            fig_pie = px.pie(
+                pie_data,
+                values='Total_Amount',
+                names='Product',
+                hole=0.4,
+                color_discrete_sequence=px.colors.qualitative.Set3
+            )
+            
+            fig_pie.update_traces(
+                textposition='outside',
+                textinfo='percent+label',
+                pull=[0.02 if i < 3 else 0 for i in range(len(pie_data))],
+                marker=dict(line=dict(color='#ffffff', width=2))
+            )
+            
+            fig_pie.update_layout(
+                height=500,
+                template='plotly_white',
+                showlegend=False,
+                annotations=[dict(text=f'Top 10<br>+Others', x=0.5, y=0.5, font_size=14, showarrow=False)]
+            )
+            
+            st.plotly_chart(fig_pie, use_container_width=True)
+        
+        # Pareto Chart
+        st.markdown("#### 📊 Pareto Analysis (80/20 Rule)")
+        
+        pareto_data = top_products.copy()
+        pareto_data['Cumulative_Revenue'] = pareto_data['Total_Amount'].cumsum()
+        pareto_data['Cumulative_Percentage'] = (pareto_data['Cumulative_Revenue'] / 
+                                                pareto_data['Total_Amount'].sum() * 100)
+        
+        fig_pareto = go.Figure()
+        
+        # Bar chart
+        fig_pareto.add_trace(go.Bar(
+            x=list(range(len(pareto_data.head(15)))),
+            y=pareto_data.head(15)['Total_Amount'],
+            name='Revenue',
+            marker_color='royalblue',
+            text=pareto_data.head(15)['Total_Amount'].apply(lambda x: f'{CURRENCY}{x/1000:.0f}K'),
+            textposition='auto'
+        ))
+        
+        # Line chart for cumulative percentage
+        fig_pareto.add_trace(go.Scatter(
+            x=list(range(len(pareto_data.head(15)))),
+            y=pareto_data.head(15)['Cumulative_Percentage'],
+            name='Cumulative %',
+            yaxis='y2',
+            line=dict(color='red', width=3),
+            marker=dict(size=8)
+        ))
+        
+        # 80% line
+        fig_pareto.add_hline(y=80, line_dash="dash", line_color="green", 
+                            annotation_text="80% Threshold", yref='y2')
+        
+        fig_pareto.update_layout(
+            title="Pareto Chart: Product Contribution Analysis",
+            xaxis=dict(
+                tickmode='array',
+                tickvals=list(range(len(pareto_data.head(15)))),
+                ticktext=[p[:15] + "..." if len(p) > 15 else p for p in pareto_data.head(15).index],
+                tickangle=-45
+            ),
+            yaxis=dict(title='Revenue', side='left'),
+            yaxis2=dict(
+                title='Cumulative %',
+                side='right',
+                overlaying='y',
+                range=[0, 100],
+                ticksuffix='%'
+            ),
+            height=500,
+            template='plotly_white',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02)
+        )
+        
+        st.plotly_chart(fig_pareto, use_container_width=True)
+        
+        # Find products contributing to 80%
+        products_80 = pareto_data[pareto_data['Cumulative_Percentage'] <= 80]
+        if not products_80.empty:
+            st.success(f"🎯 **Insight:** Top {len(products_80)} products ({len(products_80)/len(pareto_data)*100:.1f}%) "
+                      f"contribute to 80% of total revenue in {selected_state}")
+    
+    with tab3:
+        st.markdown(f"#### 📈 Monthly Trends for Top 5 Products")
+        
+        # Get top 5 products
+        top_5_products = top_products.head(5).index.tolist()
+        
+        # Prepare monthly data
+        monthly_trends = state_df[state_df['Product'].isin(top_5_products)].copy()
+        monthly_trends['Month'] = monthly_trends['Date'].dt.to_period('M')
+        
+        monthly_agg = monthly_trends.groupby(['Month', 'Product'])['Total_Amount'].sum().reset_index()
+        monthly_agg['Month'] = monthly_agg['Month'].dt.to_timestamp()
+        
+        fig_trends = px.line(
+            monthly_agg,
+            x='Month',
+            y='Total_Amount',
+            color='Product',
+            markers=True,
+            title=f"Monthly Revenue Trends - Top 5 Products",
+            template='plotly_white'
+        )
+        
+        fig_trends.update_layout(
+            height=450,
+            xaxis_title="Month",
+            yaxis_title=f"Revenue ({CURRENCY})",
+            hovermode='x unified',
+            legend=dict(orientation="h", yanchor="bottom", y=-0.3)
+        )
+        
+        st.plotly_chart(fig_trends, use_container_width=True)
+        
+        # Seasonality analysis
+        st.markdown("#### 🗓️ Seasonality Pattern")
+        
+        seasonal_data = monthly_trends.copy()
+        seasonal_data['Month_Name'] = seasonal_data['Date'].dt.strftime('%B')
+        seasonal_data['Month_Num'] = seasonal_data['Date'].dt.month
+        
+        seasonal_agg = seasonal_data.groupby(['Month_Num', 'Month_Name'])['Total_Amount'].sum().reset_index()
+        seasonal_agg = seasonal_agg.sort_values('Month_Num')
+        
+        fig_seasonal = px.bar(
+            seasonal_agg,
+            x='Month_Name',
+            y='Total_Amount',
+            color='Total_Amount',
+            color_continuous_scale='Viridis',
+            title="Seasonal Revenue Distribution (All Products)",
+            template='plotly_white'
+        )
+        
+        fig_seasonal.update_layout(height=400, xaxis_title="Month", yaxis_title=f"Revenue ({CURRENCY})")
+        st.plotly_chart(fig_seasonal, use_container_width=True)
+    
+    with tab4:
+        st.markdown("#### 🔍 Product Performance Matrix")
+        
+        # Scatter plot: Quantity vs Revenue
+        scatter_data = top_products.head(20).reset_index()
+        
+        fig_scatter = px.scatter(
+            scatter_data,
+            x='Qty',
+            y='Total_Amount',
+            size='Orders',
+            color='Avg_Order_Value',
+            hover_name='Product',
+            text='Product',
+            title="Product Performance Matrix (Top 20)",
+            labels={
+                'Qty': 'Total Quantity Sold',
+                'Total_Amount': f'Total Revenue ({CURRENCY})',
+                'Orders': 'Number of Orders',
+                'Avg_Order_Value': f'Avg Order Value ({CURRENCY})'
+            },
+            template='plotly_white',
+            color_continuous_scale='Plasma'
+        )
+        
+        fig_scatter.update_traces(
+            textposition='top center',
+            textfont=dict(size=9),
+            marker=dict(line=dict(width=1, color='DarkSlateGrey'))
+        )
+        
+        fig_scatter.update_layout(height=550)
+        st.plotly_chart(fig_scatter, use_container_width=True)
+        
+        # Product comparison table with all metrics
+        st.markdown("#### 📊 Complete Product Metrics")
+        
+        complete_metrics = top_products.copy()
+        
+        # Only calculate if columns exist
+        if 'Qty' in complete_metrics.columns and complete_metrics['Qty'].sum() > 0:
+            complete_metrics['Revenue_per_Unit'] = complete_metrics['Total_Amount'] / complete_metrics['Qty']
+        else:
+            complete_metrics['Revenue_per_Unit'] = 0
+            
+        complete_metrics['Revenue_per_Order'] = complete_metrics['Total_Amount'] / complete_metrics['Orders']
+        
+        # Format for display
+        display_complete = complete_metrics.copy()
+        display_complete['Total_Amount'] = display_complete['Total_Amount'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_complete['Qty'] = display_complete['Qty'].apply(lambda x: f"{x:,.0f}")
+        display_complete['Orders'] = display_complete['Orders'].apply(lambda x: f"{x:,}")
+        display_complete['Avg_Order_Value'] = display_complete['Avg_Order_Value'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_complete['Market_Share'] = display_complete['Market_Share'].apply(lambda x: f"{x:.2f}%")
+        display_complete['Revenue_per_Unit'] = display_complete['Revenue_per_Unit'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_complete['Revenue_per_Order'] = display_complete['Revenue_per_Order'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        
+        st.dataframe(
+            display_complete[['Total_Amount', 'Qty', 'Orders', 'Avg_Order_Value', 
+                             'Market_Share', 'Revenue_per_Unit', 'Revenue_per_Order']],
+            use_container_width=True,
+            height=500
+        )
+        
+        # Export option
+        st.download_button(
+            label="📥 Download Product Analysis (CSV)",
+            data=top_products.to_csv().encode('utf-8'),
+            file_name=f'best_sellers_{selected_state}_{selected_year_option.replace(" ", "_")}.csv',
+            mime='text/csv'
+        )
 # ==========================================
-# REPORT 13: COMPANY ANALYSIS
+# REPORT 13: COMPANY ANALYSIS (ENHANCED & FIXED)
 # ==========================================
 elif report == "🏢 Company Analysis":
     st.markdown("## 🏢 Customer/Company Deep Dive")
+    st.markdown("---")
     
-    # Top companies
-    top_companies = df.groupby('Company').agg({
-        'Total_Amount': ['sum', 'count', 'mean'],
-        'Qty': 'sum'
+    # Ensure Date column is datetime and extract Year
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    df['Year'] = df['Date'].dt.year
+    
+    # Get available years
+    available_years = sorted(df['Year'].unique())
+    
+    # Header filters
+    col_year, col_segment, col_metric = st.columns([1, 1, 1])
+    
+    with col_year:
+        year_option = st.selectbox(
+            "📅 Select Period:",
+            ["All Years"] + [str(y) for y in available_years],
+            help="Analyze companies across specific time period"
+        )
+    
+    # Filter data based on year
+    if year_option != "All Years":
+        selected_year = int(year_option)
+        analysis_df = df[df['Year'] == selected_year].copy()
+        period_label = f" ({selected_year})"
+    else:
+        analysis_df = df.copy()
+        period_label = " (All Time)"
+    
+    with col_segment:
+        segmentation = st.selectbox(
+            "🎯 Segment By:",
+            ["Revenue", "Order Frequency", "Order Value", "Growth Potential"],
+            help="Choose segmentation strategy for customer analysis"
+        )
+    
+    with col_metric:
+        view_type = st.selectbox(
+            "👁️ View:",
+            ["Top Performers", "At-Risk Customers", "New Opportunities", "Complete List"],
+            help="Filter companies by performance category"
+        )
+    
+    st.markdown("---")
+    
+    # Calculate comprehensive company metrics
+    company_metrics = analysis_df.groupby('Company').agg({
+        'Total_Amount': ['sum', 'count', 'mean', 'std'],
+        'Qty': ['sum', 'mean'],
+        'Inquiry_No': 'nunique',
+        'Date': ['min', 'max'],
+        'Product': 'nunique',
+        'State': lambda x: x.mode().iloc[0] if not x.empty else 'Unknown'
     }).round(2)
-    top_companies.columns = ['Total_Revenue', 'Orders', 'Avg_Order', 'Total_Qty']
-    top_companies = top_companies.sort_values('Total_Revenue', ascending=False).head(50)
     
-    # Filters
-    min_orders = st.slider("📊 Minimum Orders:", 1, int(top_companies['Orders'].max()), 1)
-    filtered_companies = top_companies[top_companies['Orders'] >= min_orders]
+    # Flatten column names
+    company_metrics.columns = [
+        'Total_Revenue', 'Total_Orders', 'Avg_Order_Value', 'Order_StdDev',
+        'Total_Qty', 'Avg_Qty_Per_Order', 'Unique_Orders', 
+        'First_Order', 'Last_Order', 'Unique_Products', 'Primary_State'
+    ]
     
-    st.dataframe(filtered_companies.style.format({
-        'Total_Revenue': lambda x: f"{CURRENCY}{x:,.0f}",
-        'Avg_Order': lambda x: f"{CURRENCY}{x:,.0f}"
-    }), use_container_width=True)
+    # Calculate additional metrics
+    company_metrics['Days_Since_Last_Order'] = (
+        pd.Timestamp.now() - pd.to_datetime(company_metrics['Last_Order'])
+    ).dt.days
     
-    # Visualization
-    fig = px.scatter(filtered_companies.reset_index(), x='Orders', y='Total_Revenue',
-                    size='Total_Qty', color='Avg_Order', hover_name='Company',
-                    color_continuous_scale='Viridis')
-    st.plotly_chart(fig, use_container_width=True)
+    company_metrics['Customer_Lifespan_Days'] = (
+        pd.to_datetime(company_metrics['Last_Order']) - 
+        pd.to_datetime(company_metrics['First_Order'])
+    ).dt.days + 1
+    
+    company_metrics['Order_Frequency'] = (
+        company_metrics['Total_Orders'] / company_metrics['Customer_Lifespan_Days'] * 30
+    ).fillna(0)
+    
+    company_metrics['Revenue_Per_Day'] = (
+        company_metrics['Total_Revenue'] / company_metrics['Customer_Lifespan_Days']
+    ).fillna(0)
+    
+    # Customer Segmentation (RFM-style analysis)
+    company_metrics['Recency_Score'] = pd.qcut(
+        company_metrics['Days_Since_Last_Order'], 
+        q=5, 
+        labels=[5,4,3,2,1],
+        duplicates='drop'
+    ).astype(int)
+    
+    company_metrics['Frequency_Score'] = pd.qcut(
+        company_metrics['Total_Orders'].rank(method='first'), 
+        q=5, 
+        labels=[1,2,3,4,5],
+        duplicates='drop'
+    ).astype(int)
+    
+    company_metrics['Monetary_Score'] = pd.qcut(
+        company_metrics['Total_Revenue'].rank(method='first'), 
+        q=5, 
+        labels=[1,2,3,4,5],
+        duplicates='drop'
+    ).astype(int)
+    
+    company_metrics['RFM_Score'] = (
+        company_metrics['Recency_Score'].astype(str) + 
+        company_metrics['Frequency_Score'].astype(str) + 
+        company_metrics['Monetary_Score'].astype(str)
+    )
+    
+    # Customer Tier Classification
+    def classify_customer(row):
+        if row['Monetary_Score'] >= 4 and row['Frequency_Score'] >= 4:
+            return '💎 Champion'
+        elif row['Monetary_Score'] >= 4:
+            return '🥇 Loyal Customer'
+        elif row['Frequency_Score'] >= 4:
+            return '📈 Potential Loyalist'
+        elif row['Recency_Score'] >= 4:
+            return '🆕 New Customer'
+        elif row['Recency_Score'] <= 2 and row['Monetary_Score'] >= 3:
+            return '⚠️ At Risk'
+        elif row['Recency_Score'] <= 2:
+            return '😴 Hibernating'
+        else:
+            return '📊 Needs Attention'
+    
+    company_metrics['Customer_Segment'] = company_metrics.apply(classify_customer, axis=1)
+    
+    # Filter based on view type
+    if view_type == "Top Performers":
+        filtered_metrics = company_metrics[company_metrics['Monetary_Score'] >= 4].copy()
+    elif view_type == "At-Risk Customers":
+        filtered_metrics = company_metrics[
+            (company_metrics['Customer_Segment'].str.contains('At Risk|Hibernating')) |
+            (company_metrics['Days_Since_Last_Order'] > 90)
+        ].copy()
+    elif view_type == "New Opportunities":
+        filtered_metrics = company_metrics[
+            (company_metrics['Customer_Segment'].str.contains('New|Potential')) |
+            (company_metrics['Total_Orders'] <= 3) & (company_metrics['Total_Revenue'] > company_metrics['Total_Revenue'].median())
+        ].copy()
+    else:
+        filtered_metrics = company_metrics.copy()
+    
+    # Additional filters
+    st.markdown("### 🔍 Filter Controls")
+    
+    col_f1, col_f2, col_f3, col_f4 = st.columns(4)
+    
+    with col_f1:
+        # FIXED: Removed currency symbol from format
+        min_revenue = st.number_input(
+            "Min Revenue:",
+            min_value=0.0,
+            value=0.0,
+            step=1000.0,
+            format="%.0f",
+            help=f"Minimum revenue threshold (in {CURRENCY})"
+        )
+        # Show currency indicator below
+        st.caption(f"Currency: {CURRENCY}")
+    
+    with col_f2:
+        min_orders = st.number_input(
+            "Min Orders:",
+            min_value=1,
+            value=1,
+            step=1
+        )
+    
+    with col_f3:
+        max_days_inactive = st.slider(
+            "Max Days Inactive:",
+            min_value=0,
+            max_value=int(company_metrics['Days_Since_Last_Order'].max()),
+            value=int(company_metrics['Days_Since_Last_Order'].max())
+        )
+    
+    with col_f4:
+        selected_segments = st.multiselect(
+            "Customer Segments:",
+            options=sorted(company_metrics['Customer_Segment'].unique()),
+            default=sorted(company_metrics['Customer_Segment'].unique())
+        )
+    
+    # Apply filters
+    display_df = filtered_metrics[
+        (filtered_metrics['Total_Revenue'] >= min_revenue) &
+        (filtered_metrics['Total_Orders'] >= min_orders) &
+        (filtered_metrics['Days_Since_Last_Order'] <= max_days_inactive) &
+        (filtered_metrics['Customer_Segment'].isin(selected_segments))
+    ].copy()
+    
+    # Sort based on segmentation selection
+    if segmentation == "Revenue":
+        display_df = display_df.sort_values('Total_Revenue', ascending=False)
+    elif segmentation == "Order Frequency":
+        display_df = display_df.sort_values('Order_Frequency', ascending=False)
+    elif segmentation == "Order Value":
+        display_df = display_df.sort_values('Avg_Order_Value', ascending=False)
+    else:
+        display_df['Growth_Score'] = (
+            display_df['Frequency_Score'] + 
+            display_df['Monetary_Score'] - 
+            (5 - display_df['Recency_Score'])
+        )
+        display_df = display_df.sort_values('Growth_Score', ascending=False)
+    
+    # KPI Cards
+    st.markdown("---")
+    st.markdown(f"### 📊 Overview{period_label}")
+    
+    col_kpi1, col_kpi2, col_kpi3, col_kpi4, col_kpi5 = st.columns(5)
+    
+    with col_kpi1:
+        st.metric("Total Companies", f"{len(display_df):,}")
+    
+    with col_kpi2:
+        total_revenue = display_df['Total_Revenue'].sum()
+        st.metric("Total Revenue", f"{CURRENCY}{total_revenue:,.0f}")
+    
+    with col_kpi3:
+        total_orders = display_df['Total_Orders'].sum()
+        st.metric("Total Orders", f"{total_orders:,}")
+    
+    with col_kpi4:
+        avg_order_value = display_df['Avg_Order_Value'].mean()
+        st.metric("Avg Order Value", f"{CURRENCY}{avg_order_value:,.0f}")
+    
+    with col_kpi5:
+        avg_recency = display_df['Days_Since_Last_Order'].mean()
+        st.metric("Avg Days Inactive", f"{avg_recency:.0f}")
+    
+    # Main content tabs
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "🏆 Company Rankings", 
+        "📈 Visual Analytics", 
+        "🎯 Segment Analysis", 
+        "📋 Detailed Profiles"
+    ])
+    
+    with tab1:
+        st.markdown(f"#### Top Companies by {segmentation}")
+        
+        top_50 = display_df.head(50).copy()
+        
+        display_table = top_50[[
+            'Customer_Segment', 'Total_Revenue', 'Total_Orders', 
+            'Avg_Order_Value', 'Total_Qty', 'Days_Since_Last_Order',
+            'Order_Frequency', 'Unique_Products', 'Primary_State'
+        ]].copy()
+        
+        display_table['Total_Revenue'] = display_table['Total_Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_table['Avg_Order_Value'] = display_table['Avg_Order_Value'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_table['Order_Frequency'] = display_table['Order_Frequency'].apply(lambda x: f"{x:.1f}/month")
+        display_table['Days_Since_Last_Order'] = display_table['Days_Since_Last_Order'].apply(
+            lambda x: f"{x} days" if x <= 30 else f"⚠️ {x} days" if x <= 90 else f"🔴 {x} days"
+        )
+        
+        def highlight_segment(val):
+            if 'Champion' in val:
+                return 'background-color: gold; color: black; font-weight: bold'
+            elif 'Loyal' in val:
+                return 'background-color: silver; color: black'
+            elif 'At Risk' in val:
+                return 'background-color: #ff6b6b; color: white'
+            elif 'Hibernating' in val:
+                return 'background-color: #4ecdc4; color: white'
+            return ''
+        
+        st.dataframe(
+            display_table.style.applymap(highlight_segment, subset=['Customer_Segment']),
+            use_container_width=True,
+            height=600
+        )
+        
+        col_exp1, col_exp2 = st.columns([4, 1])
+        with col_exp2:
+            csv = top_50.to_csv().encode('utf-8')
+            st.download_button(
+                "📥 Export",
+                csv,
+                f"company_analysis_{year_option.replace(' ', '_')}.csv",
+                "text/csv"
+            )
+    
+    with tab2:
+        col_viz1, col_viz2 = st.columns(2)
+        
+        with col_viz1:
+            st.markdown("#### 💰 Revenue vs Orders Scatter")
+            
+            fig_scatter = px.scatter(
+                display_df.reset_index().head(100),
+                x='Total_Orders',
+                y='Total_Revenue',
+                size='Total_Qty',
+                color='Customer_Segment',
+                hover_name='Company',
+                hover_data=['Avg_Order_Value', 'Days_Since_Last_Order'],
+                title="Customer Segmentation Map",
+                template='plotly_white',
+                height=500
+            )
+            
+            fig_scatter.update_traces(
+                marker=dict(line=dict(width=1, color='DarkSlateGrey')),
+                selector=dict(mode='markers')
+            )
+            
+            st.plotly_chart(fig_scatter, use_container_width=True)
+        
+        with col_viz2:
+            st.markdown("#### 📊 Customer Segment Distribution")
+            
+            segment_counts = display_df['Customer_Segment'].value_counts().reset_index()
+            segment_counts.columns = ['Segment', 'Count']
+            
+            fig_pie = px.pie(
+                segment_counts,
+                values='Count',
+                names='Segment',
+                hole=0.4,
+                color_discrete_sequence=px.colors.qualitative.Set3,
+                title="Segment Breakdown"
+            )
+            
+            fig_pie.update_traces(
+                textposition='outside',
+                textinfo='percent+label',
+                pull=[0.05 if 'Champion' in seg or 'At Risk' in seg else 0 for seg in segment_counts['Segment']]
+            )
+            
+            fig_pie.update_layout(height=500, template='plotly_white', showlegend=False)
+            st.plotly_chart(fig_pie, use_container_width=True)
+        
+        st.markdown("#### 📈 Pareto Analysis (80/20 Rule)")
+        
+        pareto_df = display_df.sort_values('Total_Revenue', ascending=False).copy()
+        pareto_df['Cumulative_Revenue'] = pareto_df['Total_Revenue'].cumsum()
+        pareto_df['Cumulative_Percentage'] = (
+            pareto_df['Cumulative_Revenue'] / pareto_df['Total_Revenue'].sum() * 100
+        )
+        
+        fig_pareto = go.Figure()
+        
+        fig_pareto.add_trace(go.Bar(
+            x=list(range(min(20, len(pareto_df)))),
+            y=pareto_df.head(20)['Total_Revenue'],
+            name='Revenue',
+            marker_color='royalblue',
+            text=pareto_df.head(20)['Total_Revenue'].apply(lambda x: f'{CURRENCY}{x/1000:.0f}K'),
+            textposition='auto'
+        ))
+        
+        fig_pareto.add_trace(go.Scatter(
+            x=list(range(min(20, len(pareto_df)))),
+            y=pareto_df.head(20)['Cumulative_Percentage'],
+            name='Cumulative %',
+            yaxis='y2',
+            line=dict(color='red', width=3),
+            marker=dict(size=8)
+        ))
+        
+        fig_pareto.add_hline(y=80, line_dash="dash", line_color="green", 
+                            annotation_text="80% Line", yref='y2')
+        
+        fig_pareto.update_layout(
+            title="Top 20 Companies - Pareto Analysis",
+            xaxis=dict(
+                tickmode='array',
+                tickvals=list(range(min(20, len(pareto_df)))),
+                ticktext=[c[:10] + "..." if len(c) > 10 else c for c in pareto_df.head(20).index],
+                tickangle=-45
+            ),
+            yaxis=dict(title='Revenue', side='left'),
+            yaxis2=dict(
+                title='Cumulative %',
+                side='right',
+                overlaying='y',
+                range=[0, 100],
+                ticksuffix='%'
+            ),
+            height=450,
+            template='plotly_white',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02)
+        )
+        
+        st.plotly_chart(fig_pareto, use_container_width=True)
+        
+        top_80 = pareto_df[pareto_df['Cumulative_Percentage'] <= 80]
+        if not top_80.empty:
+            st.success(f"🎯 **80/20 Insight:** Top {len(top_80)} companies ({len(top_80)/len(pareto_df)*100:.1f}%) "
+                      f"generate 80% of total revenue ({CURRENCY}{pareto_df['Total_Revenue'].sum()*0.8:,.0f})")
+    
+    with tab3:
+        st.markdown("#### 🎯 Segment Deep Dive")
+        
+        segment_analysis = display_df.groupby('Customer_Segment').agg({
+            'Total_Revenue': ['sum', 'mean', 'count'],
+            'Total_Orders': ['sum', 'mean'],
+            'Avg_Order_Value': 'mean',
+            'Days_Since_Last_Order': 'mean',
+            'Order_Frequency': 'mean'
+        }).round(2)
+        
+        segment_analysis.columns = [
+            'Total_Revenue', 'Avg_Revenue', 'Company_Count',
+            'Total_Orders', 'Avg_Orders_Per_Company',
+            'Avg_Order_Value', 'Avg_Days_Inactive', 'Avg_Frequency_Per_Month'
+        ]
+        
+        segment_analysis['Revenue_Share'] = (
+            segment_analysis['Total_Revenue'] / segment_analysis['Total_Revenue'].sum() * 100
+        ).round(1)
+        
+        segment_analysis = segment_analysis.sort_values('Total_Revenue', ascending=False)
+        
+        display_segment = segment_analysis.copy()
+        display_segment['Total_Revenue'] = display_segment['Total_Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_segment['Avg_Revenue'] = display_segment['Avg_Revenue'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_segment['Avg_Order_Value'] = display_segment['Avg_Order_Value'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+        display_segment['Revenue_Share'] = display_segment['Revenue_Share'].apply(lambda x: f"{x}%")
+        display_segment['Avg_Frequency_Per_Month'] = display_segment['Avg_Frequency_Per_Month'].apply(lambda x: f"{x:.1f}")
+        
+        st.dataframe(display_segment, use_container_width=True)
+        
+        st.markdown("#### 💡 Strategic Recommendations")
+        
+        recommendations = {
+            '💎 Champion': "Reward them. Early adopter of new products. Will promote brand.",
+            '🥇 Loyal Customer': "Upsell higher value products. Ask for reviews/referrals.",
+            '📈 Potential Loyalist': "Offer membership/loyalty program. Keep engaged.",
+            '🆕 New Customer': "Provide onboarding support. Early stage of relationship.",
+            '⚠️ At Risk': "Send personalized reactivation campaigns. Special offers.",
+            '😴 Hibernating': "Offer win-back deals. Survey to understand needs.",
+            '📊 Needs Attention': "Don't lose them. Monitor for at-risk signals."
+        }
+        
+        for segment, rec in recommendations.items():
+            if segment in display_df['Customer_Segment'].values:
+                with st.container():
+                    col_seg, col_rec = st.columns([1, 3])
+                    with col_seg:
+                        st.markdown(f"**{segment}**")
+                    with col_rec:
+                        st.info(rec)
+    
+    with tab4:
+        st.markdown("#### 📋 Individual Company Profile")
+        
+        selected_company = st.selectbox(
+            "Select Company to View Profile:",
+            options=display_df.index.tolist(),
+            index=0 if len(display_df) > 0 else None
+        )
+        
+        if selected_company:
+            company_data = display_df.loc[selected_company]
+            company_transactions = analysis_df[analysis_df['Company'] == selected_company].copy()
+            
+            col_prof1, col_prof2, col_prof3 = st.columns([2, 2, 1])
+            
+            with col_prof1:
+                st.markdown(f"### 🏢 {selected_company}")
+                st.caption(f"Primary State: {company_data['Primary_State']}")
+                st.caption(f"Customer Since: {pd.to_datetime(company_data['First_Order']).strftime('%b %Y')}")
+            
+            with col_prof2:
+                segment = company_data['Customer_Segment']
+                st.markdown(f"**Segment:** {segment}")
+                
+                rfm_score = int(company_data['Recency_Score']) + int(company_data['Frequency_Score']) + int(company_data['Monetary_Score'])
+                st.progress(rfm_score / 15, text=f"RFM Score: {rfm_score}/15")
+            
+            with col_prof3:
+                st.metric("Total Revenue", f"{CURRENCY}{company_data['Total_Revenue']:,.0f}")
+                st.metric("Total Orders", f"{int(company_data['Total_Orders'])}")
+            
+            st.markdown("#### 📜 Transaction History")
+            
+            trans_display = company_transactions[[
+                'Date', 'Inquiry_No', 'Product', 'Qty', 'Total_Amount', 'State'
+            ]].sort_values('Date', ascending=False)
+            
+            trans_display['Date'] = pd.to_datetime(trans_display['Date']).dt.strftime('%Y-%m-%d')
+            trans_display['Total_Amount'] = trans_display['Total_Amount'].apply(lambda x: f"{CURRENCY}{x:,.0f}")
+            
+            st.dataframe(trans_display, use_container_width=True, height=300)
+            
+            st.markdown("#### 🏷️ Product Preferences")
+            
+            product_pref = company_transactions.groupby('Product').agg({
+                'Total_Amount': 'sum',
+                'Qty': 'sum',
+                'Inquiry_No': 'count'
+            }).rename(columns={'Inquiry_No': 'Orders'}).sort_values('Total_Amount', ascending=False).head(10)
+            
+            fig_pref = px.bar(
+                product_pref.reset_index(),
+                x='Total_Amount',
+                y='Product',
+                orientation='h',
+                color='Orders',
+                color_continuous_scale='Blues',
+                title=f"Top Products for {selected_company}",
+                labels={'Total_Amount': f'Revenue ({CURRENCY})'}
+            )
+            fig_pref.update_layout(height=350, template='plotly_white', yaxis=dict(autorange="reversed"))
+            st.plotly_chart(fig_pref, use_container_width=True)
+            
+            if len(company_transactions) > 1:
+                st.markdown("#### 📈 Purchase Trend")
+                
+                monthly_company = company_transactions.groupby(
+                    company_transactions['Date'].dt.to_period('M')
+                )['Total_Amount'].sum().reset_index()
+                monthly_company['Date'] = monthly_company['Date'].dt.to_timestamp()
+                
+                fig_trend = px.line(
+                    monthly_company,
+                    x='Date',
+                    y='Total_Amount',
+                    markers=True,
+                    title="Monthly Purchase History",
+                    template='plotly_white'
+                )
+                fig_trend.update_layout(height=300)
+                st.plotly_chart(fig_trend, use_container_width=True)
 
 # ==========================================
 # REPORT 14: CUSTOMER SEGMENTATION (ENHANCED WITH LISTS)
@@ -2296,34 +5645,242 @@ elif report == "⚡ Lead Time Analysis":
         st.warning("No valid lead time data available (check EDD dates format in your sheet)")
 
 # ==========================================
-# REPORT: RAW DATA EXPLORER  
+# REPORT: RAW DATA EXPLORER (ENHANCED)
 # ==========================================
 elif report == "📋 Raw Data Explorer":
     st.markdown("## 📋 Interactive Data Explorer")
+    st.markdown("---")
+    
+    # Data integrity check section
+    with st.expander("🔍 Data Integrity Status", expanded=False):
+        col_check1, col_check2, col_check3 = st.columns(3)
+        
+        with col_check1:
+            total_records_source = len(df)
+            st.metric("Total Records in DataFrame", f"{total_records_source:,}")
+        
+        with col_check2:
+            # Check for duplicates
+            duplicate_count = df.duplicated().sum()
+            st.metric("Duplicate Rows", f"{duplicate_count:,}", 
+                     delta=None if duplicate_count == 0 else "Check data")
+        
+        with col_check3:
+            # Check for null values in key columns
+            null_counts = df[['Inquiry_No', 'Date', 'State', 'Product']].isnull().sum().sum()
+            st.metric("Missing Values (Key Columns)", f"{null_counts:,}",
+                     delta=None if null_counts == 0 else "Data Quality Issue")
+        
+        # Show data range info
+        st.caption(f"📅 Date Range: {df['Date'].min().strftime('%Y-%m-%d')} to {df['Date'].max().strftime('%Y-%m-%d')}")
+        st.caption(f"🗺️ Unique States: {df['State'].nunique()} | 🏷️ Unique Products: {df['Product'].nunique()}")
+        
+        # Show last few records to verify data loading
+        with st.container():
+            st.markdown("**📝 Last 5 Records (Verification):**")
+            st.dataframe(df.tail(5), use_container_width=True, height=200)
     
     # Advanced filters
     with st.expander("🔍 Advanced Filters", expanded=True):
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
+        
         with col1:
-            f_states = st.multiselect("States:", df['State'].unique(), default=[])
+            # Add "Select All" option for states
+            all_states = sorted(df['State'].unique())
+            select_all_states = st.checkbox("Select All States", value=True, key="select_all_states")
+            if select_all_states:
+                f_states = st.multiselect("States:", all_states, default=all_states, key="states_multiselect")
+            else:
+                f_states = st.multiselect("States:", all_states, default=[], key="states_multiselect")
+        
         with col2:
-            f_products = st.multiselect("Products:", df['Product'].unique(), default=[])
+            # Add "Select All" option for products
+            all_products = sorted(df['Product'].unique())
+            select_all_products = st.checkbox("Select All Products", value=True, key="select_all_products")
+            if select_all_products:
+                f_products = st.multiselect("Products:", all_products, default=all_products[:50], key="products_multiselect")  # Limit default to prevent lag
+            else:
+                f_products = st.multiselect("Products:", all_products, default=[], key="products_multiselect")
+        
         with col3:
-            date_range = st.date_input("Date Range:", [df['Date'].min(), df['Date'].max()])
+            # Better date range handling
+            min_date = df['Date'].min().date()
+            max_date = df['Date'].max().date()
+            date_range = st.date_input(
+                "Date Range:", 
+                [min_date, max_date],
+                min_value=min_date,
+                max_value=max_date
+            )
+        
+        with col4:
+            st.markdown("<br>", unsafe_allow_html=True)
+            reset_filters = st.button("🔄 Reset", use_container_width=True)
+            if reset_filters:
+                st.rerun()
     
-    # Apply filters
+    # Apply filters with validation
     filtered = df.copy()
+    filter_log = []
+    
     if f_states:
         filtered = filtered[filtered['State'].isin(f_states)]
+        filter_log.append(f"States: {len(f_states)} selected")
+    
     if f_products:
         filtered = filtered[filtered['Product'].isin(f_products)]
-    if len(date_range) == 2:
-        filtered = filtered[(filtered['Date'] >= pd.Timestamp(date_range[0])) & 
-                           (filtered['Date'] <= pd.Timestamp(date_range[1]))]
+        filter_log.append(f"Products: {len(f_products)} selected")
     
-    # Show the data table
-    st.dataframe(filtered, use_container_width=True, height=600)
+    if len(date_range) == 2:
+        start_date, end_date = date_range
+        # Ensure we capture the full end date (up to 23:59:59)
+        start_timestamp = pd.Timestamp(start_date)
+        end_timestamp = pd.Timestamp(end_date) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
+        
+        filtered = filtered[(filtered['Date'] >= start_timestamp) & 
+                           (filtered['Date'] <= end_timestamp)]
+        filter_log.append(f"Date: {start_date} to {end_date}")
+    
+    # Display filter summary
+    st.markdown("---")
+    col_summary1, col_summary2, col_summary3 = st.columns([2, 2, 1])
+    
+    with col_summary1:
+        st.markdown(f"**📊 Showing {len(filtered):,} of {len(df):,} records**")
+        if filter_log:
+            st.caption(" | ".join(filter_log))
+    
+    with col_summary2:
+        # Pagination info
+        if len(filtered) > 0:
+            st.caption(f"💾 Memory Usage: ~{filtered.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+    
+    with col_summary3:
+        # Export button
+        if len(filtered) > 0:
+            csv = filtered.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Export CSV",
+                data=csv,
+                file_name=f'raw_data_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+                mime='text/csv',
+                use_container_width=True
+            )
+    
+    # Data display with guaranteed full dataset visibility
+    if len(filtered) == 0:
+        st.warning("⚠️ No records match the selected filters. Please adjust your criteria.")
+    else:
+        # Show data with pagination options
+        st.markdown("### 📋 Data Table")
+        
+        # Option to show all or paginated
+        show_option = st.radio(
+            "Display Mode:",
+            ["Show All (Up to 1000 rows)", "Paginated View"],
+            horizontal=True,
+            key="display_mode"
+        )
+        
+        if show_option == "Show All (Up to 1000 rows)" and len(filtered) <= 1000:
+            display_df = filtered
+            height_setting = min(800, 40 + (len(display_df) * 35))  # Dynamic height
+        else:
+            # Paginated view
+            rows_per_page = st.selectbox("Rows per page:", [10, 25, 50, 100, 200], index=2)
+            total_pages = max(1, (len(filtered) + rows_per_page - 1) // rows_per_page)
+            
+            col_page1, col_page2, col_page3 = st.columns([1, 2, 1])
+            with col_page2:
+                current_page = st.number_input(
+                    f"Page (of {total_pages}):", 
+                    min_value=1, 
+                    max_value=total_pages, 
+                    value=1
+                )
+            
+            start_idx = (current_page - 1) * rows_per_page
+            end_idx = min(start_idx + rows_per_page, len(filtered))
+            display_df = filtered.iloc[start_idx:end_idx]
+            
+            st.caption(f"Showing rows {start_idx + 1} to {end_idx} of {len(filtered)}")
+            height_setting = min(600, 40 + (len(display_df) * 35))
+        
+        # Display the dataframe with full configuration
+        st.dataframe(
+            display_df,
+            use_container_width=True,
+            height=int(height_setting),
+            column_config={
+                "Date": st.column_config.DateColumn(
+                    "Date",
+                    format="YYYY-MM-DD",
+                    help="Order date"
+                ),
+                "Total_Amount": st.column_config.NumberColumn(
+                    f"Amount ({CURRENCY})",
+                    format=f"{CURRENCY}%.2f",
+                    help="Total order amount"
+                ),
+                "Qty": st.column_config.NumberColumn(
+                    "Quantity",
+                    format="%d",
+                    help="Quantity ordered"
+                ),
+                "Inquiry_No": st.column_config.TextColumn(
+                    "Inquiry #",
+                    help="Unique inquiry number"
+                ),
+                "State": st.column_config.TextColumn(
+                    "State",
+                    help="Customer state"
+                ),
+                "Product": st.column_config.TextColumn(
+                    "Product",
+                    help="Product name",
+                    width="large"
+                )
+            },
+            hide_index=False  # Show index to verify row count
+        )
+        
+        # Row index verification
+        st.caption(f"🔢 Row Indices: {display_df.index.min()} to {display_df.index.max()} "
+                  f"(Total: {len(display_df)} rows)")
+        
+        # Show last row details to verify data completeness
+        with st.expander("🔍 Verify Last Record"):
+            if len(filtered) > 0:
+                last_record = filtered.iloc[-1]
+                st.json(last_record.to_dict())
+                st.caption(f"Index position: {filtered.index[-1]}")
+    
+    # Data statistics
+    with st.expander("📊 Quick Statistics"):
+        if len(filtered) > 0:
+            col_stat1, col_stat2, col_stat3 = st.columns(3)
+            
+            with col_stat1:
+                st.metric("Total Revenue", f"{CURRENCY}{filtered['Total_Amount'].sum():,.2f}")
+                st.metric("Avg Order Value", f"{CURRENCY}{filtered['Total_Amount'].mean():,.2f}")
+            
+            with col_stat2:
+                st.metric("Total Quantity", f"{filtered['Qty'].sum():,}")
+                st.metric("Avg Quantity", f"{filtered['Qty'].mean():.2f}")
+            
+            with col_stat3:
+                st.metric("Unique Orders", f"{filtered['Inquiry_No'].nunique():,}")
+                st.metric("Date Range", f"{(filtered['Date'].max() - filtered['Date'].min()).days} days")
 
-# Global Footer
+# Global Footer - FIXED to show accurate count
 st.sidebar.markdown("---")
-st.sidebar.caption(f"🔄 Auto-refresh: 5 min | 📊 Records: {len(df):,}")
+st.sidebar.caption(f"🔄 Auto-refresh: 5 min | 📊 Total Records: {len(df):,}")
+
+# Additional verification in sidebar
+with st.sidebar.expander("🔍 Data Verification"):
+    st.write(f"DataFrame Shape: {df.shape}")
+    st.write(f"Index Range: {df.index.min()} to {df.index.max()}")
+    st.write(f"Memory Usage: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+    if st.button("🔄 Force Reload Data"):
+        st.cache_data.clear()
+        st.rerun()
