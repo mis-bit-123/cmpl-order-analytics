@@ -208,7 +208,7 @@ class OrderDataLoader:
                 # Clear existing data if updating
                 worksheet.clear()
             except gspread.WorksheetNotFound:
-                # Create new worksheet
+                # Create new Worksheet 
                 worksheet = sheet.add_worksheet(title=BRUSH_SHEET_NAME, rows=1000, cols=20)
             
             # Prepare data for storage
