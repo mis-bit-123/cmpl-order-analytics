@@ -41,7 +41,7 @@ class OrderDataLoader:
             # Extract columns: A=0, B=1, D=3, E=4, G=6, H=7, I=8, O=14, S=18
             processed_data = []
             for row in data_rows:
-                if len(row) >= 19:
+                if len(row) >= 21:
                     try:
                         processed_data.append({
                             'Date': row[0],           # A: Timestamp
