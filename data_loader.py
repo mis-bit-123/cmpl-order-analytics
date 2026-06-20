@@ -46,14 +46,14 @@ class OrderDataLoader:
                         processed_data.append({
                             'Date': row[0],           # A: Timestamp
     'Inquiry_No': row[1],     # B: Inquiry No
-    'Company': row[3],        # D: Company Name
-    'Client_Name': row[5],    # F: Client Name ✅ Correct
-    'Product': row[6],        # G: Product Description
-    'Qty': row[7],            # H: Quantity
-    'City': row[8],           # I: City ✅ Was 9, now 8
-    'State': row[9],          # J: State ✅ Was 8, now 9
-    'Total_Amount': row[14],  # O: Total Amount
-    'EDD': row[18]            # S: Delivery Date
+    'Company': row[5],        # F: Company Name
+    'Client_Name': row[6],    # G: Client Name ✅ Correct
+    'Product': row[7],        # H: Product Description
+    'Qty': row[8],            # I: Quantity
+    'City': row[9],           # J: City ✅
+    'State': row[10],          # H: State ✅ 
+    'Total_Amount': row[15],  # P: Total Amount
+    'EDD': row[20]            # U: Delivery Date
                         })
                     except:
                         continue
